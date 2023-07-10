@@ -130,15 +130,19 @@
           "uri": {
             "type": "string",
             "description": "URI для которого был осуществлен запрос",
+            "nullable": false,
             "example": "/events/1"
           },
           "ip": {
             "type": "string",
             "description": "IP-адрес пользователя, осуществившего запрос",
+            "nullable": false,
             "example": "192.163.0.1"
           },
           "timestamp": {
             "type": "string",
+            "nullable": false,
+            "format": "date-time",
             "description": "Дата и время, когда был совершен запрос к эндпоинту (в формате \"yyyy-MM-dd HH:mm:ss\")",
             "example": "2022-09-06 11:00:23"
           }
