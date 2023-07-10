@@ -19,7 +19,6 @@ public class StatControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-
     @Test
     void postStatic_returnResponseWithStatusOk() throws Exception {
         var requestBuilder = MockMvcRequestBuilders.post("/hit");
@@ -39,7 +38,5 @@ public class StatControllerTest {
 //                                }
 //                                """
                 );
-
-
     }
 }
