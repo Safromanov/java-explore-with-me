@@ -1,4 +1,7 @@
-package ru.practicum;
+package ru.practicum.model;
+
+import ru.practicum.model.dto.PostDtoStatReq;
+import ru.practicum.model.StatData;
 
 public class StatDataMapper {
 

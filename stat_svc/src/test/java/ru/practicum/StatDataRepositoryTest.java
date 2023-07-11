@@ -1,13 +1,13 @@
 package ru.practicum;
 
-import org.apache.catalina.LifecycleState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import ru.practicum.model.dto.GetDto;
+import ru.practicum.model.StatData;
+import ru.practicum.server.StatDataRepository;
 
-import java.lang.reflect.Array;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -81,12 +81,10 @@ class StatDataRepositoryTest {
                 LocalDateTime.now(),
                 new String[]{"/events/1", "/events/2"});
 
-
         assertEquals(2, getDtoList.size());
         assertEquals("/events/1", getDtoList.get(0).getUri());
         assertEquals("/events/2", getDtoList.get(1).getUri());
         assertEquals(1, getDtoList.get(0).getHits());
         assertEquals(1, getDtoList.get(1).getHits());
     }
-
 }
