@@ -142,7 +142,6 @@
           "timestamp": {
             "type": "string",
             "nullable": false,
-            "format": "date-time",
             "description": "Дата и время, когда был совершен запрос к эндпоинту (в формате \"yyyy-MM-dd HH:mm:ss\")",
             "example": "2022-09-06 11:00:23"
           }

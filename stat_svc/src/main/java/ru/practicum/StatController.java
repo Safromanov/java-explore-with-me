@@ -1,19 +1,34 @@
 package ru.practicum;
 
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping
+@RequiredArgsConstructor
 public class StatController {
 
+    private final StatisticsService statisticsService;
+
     @PostMapping("/hit")
-    public ResponseEntity<PostDtoStatResponse> addStat(PostDtoStatReq dtoReq) {
-        return new ResponseEntity<>(new PostDtoStatResponse(), HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addStatisticalData(@RequestBody PostDtoStatReq dtoReq) {
+        statisticsService.addStatisticalData(dtoReq);
     }
 
+    @GetMapping("/stats")
+    @ResponseStatus(HttpStatus.OK)
+    public List<GetDto> getStatistics(@RequestParam LocalDateTime start,
+                                      @RequestParam LocalDateTime end,
+                                      @RequestParam String[] uris,
+                                      @RequestParam boolean unique) {
+        return statisticsService.getStatistics(start, end, uris, unique);
+    }
 }
+
+
