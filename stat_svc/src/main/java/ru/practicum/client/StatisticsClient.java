@@ -27,10 +27,9 @@ public class StatisticsClient {
     }
 
     public ResponseEntity<Object> addHit(String appName, String uri, String ip, LocalDateTime timestamp) {
-        HitDto HitDto = new HitDto(appName, uri, ip, timestamp);
-        return post("/hit", HitDto);
+        HitDto hitDto = new HitDto(appName, uri, ip, timestamp);
+        return post("/hit", hitDto);
     }
-
 
     private ResponseEntity<Object> get(String path, Map<String, Object> parameters) {
         return makeAndSendRequest(HttpMethod.GET, path, parameters, null);

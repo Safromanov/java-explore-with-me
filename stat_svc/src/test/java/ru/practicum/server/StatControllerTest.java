@@ -80,7 +80,8 @@ public class StatControllerTest {
                         "192.163.0.1/l",
                         LocalDateTime.now()));
 
-        requestBuilder= MockMvcRequestBuilders.post("/hit").contentType(MediaType.APPLICATION_JSON).content(jsonWithEmptyURI);
+        requestBuilder = MockMvcRequestBuilders.post("/hit")
+                .contentType(MediaType.APPLICATION_JSON).content(jsonWithEmptyURI);
         this.mockMvc.perform(requestBuilder)
                 .andExpectAll(
                         status().isBadRequest()

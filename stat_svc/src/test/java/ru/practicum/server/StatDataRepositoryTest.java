@@ -4,8 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import ru.practicum.model.dto.GetStatDto;
 import ru.practicum.model.StatData;
+import ru.practicum.model.dto.GetStatDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,7 +19,7 @@ class StatDataRepositoryTest {
     private StatDataRepository statDataRepository;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         StatData statData1 = new StatData();
         statData1.setApp("ewm-main-service");
         statData1.setUri("/events/1");
@@ -44,7 +44,7 @@ class StatDataRepositoryTest {
     }
 
     @Test
-    void testFindStatistics(){
+    void testFindStatistics() {
 
         List<GetStatDto> getStatDtoList = statDataRepository.getStatisticForUris(LocalDateTime.now().minusDays(2),
                 LocalDateTime.now(),
@@ -67,7 +67,7 @@ class StatDataRepositoryTest {
     }
 
     @Test
-    void testFindStatisticsForUnIp(){
+    void testFindStatisticsForUnIp() {
         List<GetStatDto> getStatDtoList = statDataRepository.getStatisticForUrisWithUniqueIp(LocalDateTime.now().minusDays(2),
                 LocalDateTime.now(),
                 new String[]{"/events/1"});
