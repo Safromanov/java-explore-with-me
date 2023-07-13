@@ -7,7 +7,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Getter
 @ToString
-public class GetDto {
+public class GetStatDto {
 
     private final String app;
     private final String uri;

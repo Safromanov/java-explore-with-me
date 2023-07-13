@@ -6,12 +6,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.*;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
-import ru.practicum.model.dto.GetDto;
+import org.springframework.web.client.RestTemplate;
+import ru.practicum.model.dto.GetStatDto;
 import ru.practicum.model.dto.HitDto;
 
 import java.net.URI;
@@ -29,17 +31,20 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 class StatisticsClientTest {
+
     @Autowired
     private ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private StatisticsClient statisticsClient;
-
     private MockRestServiceServer mockServer;
 
+    @Value("${stats-server.url}")
+    private String serverUrl;
+
     @BeforeEach
-    public void init() {
-        mockServer = MockRestServiceServer.createServer(statisticsClient.getRest());
+    public void init(@Autowired RestTemplate restTemplate) {
+        mockServer = MockRestServiceServer.createServer(restTemplate);
     }
 
     @Test
@@ -50,7 +55,7 @@ class StatisticsClientTest {
                 LocalDateTime.now());
 
         mockServer.expect(ExpectedCount.once(),
-                        requestTo(new URI("http://localhost:8080/hit")))
+                        requestTo(new URI(serverUrl + "hit")))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(mapper.writeValueAsString(hitDto)))
                 .andRespond(withStatus(HttpStatus.CREATED)
@@ -66,16 +71,16 @@ class StatisticsClientTest {
     @Test
     public void getStatsTest() throws URISyntaxException, JsonProcessingException {
 
-        List<GetDto> getDto = List.of(new GetDto("ewm-main-service",
+        List<GetStatDto> getStatDto = List.of(new GetStatDto("ewm-main-service",
                 "/events/1",
                 101L));
 
         mockServer.expect(ExpectedCount.once(),
-                        requestTo(new URI("http://localhost:8080/stats")))
+                        requestTo(new URI(serverUrl + "stats")))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(mapper.writeValueAsString(getDto))
+                        .body(mapper.writeValueAsString(getStatDto))
                 );
 
         ResponseEntity<Object> responseFromClient = statisticsClient.getStaticsForUri(LocalDateTime.now().minusDays(1),

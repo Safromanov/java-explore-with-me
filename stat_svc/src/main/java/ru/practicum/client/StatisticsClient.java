@@ -1,10 +1,5 @@
 package ru.practicum.client;
 
-import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +7,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.model.dto.HitDto;
 
 import java.time.LocalDateTime;
@@ -20,17 +14,11 @@ import java.util.Map;
 
 @Service
 public class StatisticsClient {
-    @Getter
+
     private final RestTemplate rest;
 
-    @Autowired
-    public StatisticsClient(@Value("http://localhost:8080") String serverUrl, RestTemplateBuilder builder) {
-        rest = (
-                builder
-                        .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
-                        .requestFactory(HttpComponentsClientHttpRequestFactory::new)
-                        .build()
-        );
+    public StatisticsClient(RestTemplate rest) {
+        this.rest = rest;
     }
 
     public ResponseEntity<Object> getStaticsForUri(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {

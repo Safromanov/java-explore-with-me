@@ -5,7 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 
 
@@ -13,11 +16,13 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(force = true)
 public class HitDto {
-    @NotNull
+    @NotBlank
     private final String app;
-    @NotNull
+    @NotBlank
     private final String uri;
-    @NotNull
+    @NotBlank
+    @Pattern(message = "IP address does not match the required format",
+            regexp = "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$")
     private final String ip;
     @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

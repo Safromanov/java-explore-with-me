@@ -1,12 +1,11 @@
-package ru.practicum;
+package ru.practicum.server;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import ru.practicum.model.dto.GetDto;
+import ru.practicum.model.dto.GetStatDto;
 import ru.practicum.model.StatData;
-import ru.practicum.server.StatDataRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -47,44 +46,44 @@ class StatDataRepositoryTest {
     @Test
     void testFindStatistics(){
 
-        List<GetDto> getDtoList = statDataRepository.getStatisticForUris(LocalDateTime.now().minusDays(2),
+        List<GetStatDto> getStatDtoList = statDataRepository.getStatisticForUris(LocalDateTime.now().minusDays(2),
                 LocalDateTime.now(),
                 new String[]{"/events/1"});
 
-        assertEquals(1, getDtoList.size());
-        assertEquals("/events/1", getDtoList.get(0).getUri());
-        assertEquals(2, getDtoList.get(0).getHits());
+        assertEquals(1, getStatDtoList.size());
+        assertEquals("/events/1", getStatDtoList.get(0).getUri());
+        assertEquals(2, getStatDtoList.get(0).getHits());
 
-        getDtoList = statDataRepository.getStatisticForUris(LocalDateTime.now().minusDays(4),
+        getStatDtoList = statDataRepository.getStatisticForUris(LocalDateTime.now().minusDays(4),
                 LocalDateTime.now(),
                 new String[]{"/events/1", "/events/2"});
 
 
-        assertEquals(2, getDtoList.size());
-        assertEquals("/events/1", getDtoList.get(0).getUri());
-        assertEquals("/events/2", getDtoList.get(1).getUri());
-        assertEquals(2, getDtoList.get(0).getHits());
-        assertEquals(1, getDtoList.get(1).getHits());
+        assertEquals(2, getStatDtoList.size());
+        assertEquals("/events/1", getStatDtoList.get(0).getUri());
+        assertEquals("/events/2", getStatDtoList.get(1).getUri());
+        assertEquals(2, getStatDtoList.get(0).getHits());
+        assertEquals(1, getStatDtoList.get(1).getHits());
     }
 
     @Test
     void testFindStatisticsForUnIp(){
-        List<GetDto> getDtoList = statDataRepository.getStatisticForUrisWithUniqueIp(LocalDateTime.now().minusDays(2),
+        List<GetStatDto> getStatDtoList = statDataRepository.getStatisticForUrisWithUniqueIp(LocalDateTime.now().minusDays(2),
                 LocalDateTime.now(),
                 new String[]{"/events/1"});
 
-        assertEquals(1, getDtoList.size());
-        assertEquals("/events/1", getDtoList.get(0).getUri());
-        assertEquals(1, getDtoList.get(0).getHits());
+        assertEquals(1, getStatDtoList.size());
+        assertEquals("/events/1", getStatDtoList.get(0).getUri());
+        assertEquals(1, getStatDtoList.get(0).getHits());
 
-        getDtoList = statDataRepository.getStatisticForUrisWithUniqueIp(LocalDateTime.now().minusDays(4),
+        getStatDtoList = statDataRepository.getStatisticForUrisWithUniqueIp(LocalDateTime.now().minusDays(4),
                 LocalDateTime.now(),
                 new String[]{"/events/1", "/events/2"});
 
-        assertEquals(2, getDtoList.size());
-        assertEquals("/events/1", getDtoList.get(0).getUri());
-        assertEquals("/events/2", getDtoList.get(1).getUri());
-        assertEquals(1, getDtoList.get(0).getHits());
-        assertEquals(1, getDtoList.get(1).getHits());
+        assertEquals(2, getStatDtoList.size());
+        assertEquals("/events/1", getStatDtoList.get(0).getUri());
+        assertEquals("/events/2", getStatDtoList.get(1).getUri());
+        assertEquals(1, getStatDtoList.get(0).getHits());
+        assertEquals(1, getStatDtoList.get(1).getHits());
     }
 }

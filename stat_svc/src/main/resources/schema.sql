@@ -1,4 +1,4 @@
-CREATE TABLE statistics
+CREATE TABLE IF NOT EXISTS statistics
 (
     statistical_data_id BIGINT AUTO_INCREMENT NOT NULL,
     app                 VARCHAR(255)          NOT NULL,

@@ -1,4 +1,4 @@
-package ru.practicum;
+package ru.practicum.server;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,6 +45,45 @@ public class StatControllerTest {
                 .andExpectAll(
                         status().isCreated(),
                         openApi().isValid("static/ewm-stats-service-spec.json")
+                );
+    }
+
+    @Test
+    void postStat_returnErrorCode() throws Exception {
+
+        HitDto dtoStatReq = new HitDto("ewm-main-service",
+                " ",
+                "192.163.0.1/l",
+                LocalDateTime.now());
+
+        String jsonWithEmptyURI = new ObjectMapper()
+                .registerModule(new JavaTimeModule().addDeserializer(LocalDateTime.class,
+                        new LocalDateTimeDeserializer(DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
+                .writeValueAsString(new HitDto("ewm-main-service",
+                        " ",
+                        "192.163.0.1/l",
+                        LocalDateTime.now()));
+
+        var requestBuilder = MockMvcRequestBuilders.post("/hit").contentType(MediaType.APPLICATION_JSON).content(jsonWithEmptyURI);
+
+        this.mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isBadRequest()
+                );
+
+
+        String jsonWithBadIp = new ObjectMapper()
+                .registerModule(new JavaTimeModule().addDeserializer(LocalDateTime.class,
+                        new LocalDateTimeDeserializer(DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
+                .writeValueAsString(new HitDto("ewm-main-service",
+                        "/events/1",
+                        "192.163.0.1/l",
+                        LocalDateTime.now()));
+
+        requestBuilder= MockMvcRequestBuilders.post("/hit").contentType(MediaType.APPLICATION_JSON).content(jsonWithEmptyURI);
+        this.mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isBadRequest()
                 );
     }
 
