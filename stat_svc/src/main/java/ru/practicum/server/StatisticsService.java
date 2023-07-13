@@ -5,9 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.model.StatDataMapper;
 import ru.practicum.model.dto.GetDto;
-import ru.practicum.model.dto.PostDtoStatReq;
+import ru.practicum.model.dto.HitDto;
 import ru.practicum.model.StatData;
-import ru.practicum.server.StatDataRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,7 +17,7 @@ public class StatisticsService {
 
     private final StatDataRepository statDataRepository;
 
-    public void addStatisticalData(PostDtoStatReq dtoReq) {
+    public void addStatisticalData(HitDto dtoReq) {
         StatData statData = StatDataMapper.fromDto(dtoReq);
         statDataRepository.save(statData);
     }

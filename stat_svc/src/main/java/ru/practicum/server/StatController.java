@@ -3,9 +3,10 @@ package ru.practicum.server;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.model.dto.GetDto;
-import ru.practicum.model.dto.PostDtoStatReq;
+import ru.practicum.model.dto.HitDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,8 +20,9 @@ public class StatController {
 
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addStatisticalData(@RequestBody PostDtoStatReq dtoReq) {
+    public ResponseEntity addStatisticalData(@RequestBody HitDto dtoReq) {
         statisticsService.addStatisticalData(dtoReq);
+        return new ResponseEntity(HttpStatus.CREATED);
     }
 
     @GetMapping("/stats")

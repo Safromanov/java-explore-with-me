@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @NoArgsConstructor(force = true)
-public class PostDtoStatReq {
+public class HitDto {
     @NotNull
     private final String app;
     @NotNull

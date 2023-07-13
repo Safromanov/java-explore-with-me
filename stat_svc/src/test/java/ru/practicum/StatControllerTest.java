@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import ru.practicum.model.dto.PostDtoStatReq;
+import ru.practicum.model.dto.HitDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,7 +30,7 @@ public class StatControllerTest {
     @Test
     void postStat_returnResponseWithStatusCreate() throws Exception {
 
-        PostDtoStatReq dtoStatReq = new PostDtoStatReq("ewm-main-service",
+        HitDto dtoStatReq = new HitDto("ewm-main-service",
                 "/events/1",
                 "192.163.0.1",
                 LocalDateTime.now());
@@ -50,7 +50,7 @@ public class StatControllerTest {
 
     @Test
     void getStat_returnResponseWithStatusOk() throws Exception {
-        PostDtoStatReq dtoStatReq = new PostDtoStatReq("ewm-main-service",
+        HitDto dtoStatReq = new HitDto("ewm-main-service",
                 "/events/1",
                 "192.163.0.1",
                 LocalDateTime.now());
