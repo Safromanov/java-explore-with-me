@@ -33,7 +33,7 @@ public class StatController {
     @ResponseStatus(HttpStatus.OK)
     public List<GetStatDto> getStatistics(@RequestParam LocalDateTime start,
                                           @RequestParam LocalDateTime end,
-                                          @RequestParam String[] uris,
+                                          @RequestParam(required = false) String[] uris,
                                           @RequestParam(required = false, defaultValue = "false") boolean unique) {
         log.debug("GET /stats with params: {}, {}, {}, {}", start, end, uris, unique);
         if (start.isAfter(end))
