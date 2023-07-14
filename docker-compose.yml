@@ -12,7 +12,7 @@ services:
     restart: on-failure
     environment:
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5431/stats
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stats
       - POSTGRES_USER=su
       - POSTGRES_PASSWORD=password
 
@@ -20,9 +20,9 @@ services:
     image: postgres:14-alpine
     container_name: stats-db
     ports:
-      - "6541:5431"
+      - "6541:5432"
     volumes:
-      - ewm-db:/var/lib/postgresql/data
+      - stats-db:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=stats
       - POSTGRES_USER=su
