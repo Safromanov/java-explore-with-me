@@ -1,6 +1,7 @@
 package ru.practicum.client;
 
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class StatisticsClient {
     }
 
     private ResponseEntity<Object> get(String path, Map<String, Object> parameters) {
-        HttpEntity<Object> requestEntity = new HttpEntity<>(null);
+        HttpEntity<Object> requestEntity = new HttpEntity<>(new HttpHeaders());
         return makeAndSendRequest(rest
                 .exchange(path, HttpMethod.GET, requestEntity, Object.class, parameters));
     }
