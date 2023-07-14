@@ -3,7 +3,6 @@ package ru.practicum.client;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -32,26 +31,21 @@ public class StatisticsClient {
     }
 
     private ResponseEntity<Object> get(String path, Map<String, Object> parameters) {
-        return makeAndSendRequest(HttpMethod.GET, path, parameters, null);
+        HttpEntity<Object> requestEntity = new HttpEntity<>(null);
+        return makeAndSendRequest(rest
+                .exchange(path, HttpMethod.GET, requestEntity, Object.class, parameters));
     }
 
     private <T> ResponseEntity<Object> post(String path, T body) {
-        return makeAndSendRequest(HttpMethod.POST, path, null, body);
+        HttpEntity<Object> requestEntity = new HttpEntity<>(body);
+        return makeAndSendRequest(rest
+                .exchange(path, HttpMethod.POST, requestEntity, Object.class));
     }
 
-    @SuppressWarnings("nullness")
-    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method,
-                                                          String path,
-                                                          @Nullable Map<String, Object> parameters,
-                                                          @Nullable Object body) {
-
-        HttpEntity<Object> requestEntity = new HttpEntity<>(body);
-
+    private ResponseEntity<Object> makeAndSendRequest(ResponseEntity<Object> responseEntity) {
         ResponseEntity<Object> statServerResponse;
         try {
-            statServerResponse = parameters != null
-                    ? rest.exchange(path, method, requestEntity, Object.class, parameters)
-                    : rest.exchange(path, method, requestEntity, Object.class);
+            statServerResponse = responseEntity;
         } catch (HttpStatusCodeException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
         }
