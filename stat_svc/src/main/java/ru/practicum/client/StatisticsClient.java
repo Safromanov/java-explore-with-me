@@ -33,20 +33,22 @@ public class StatisticsClient {
 
     private ResponseEntity<Object> get(String path, Map<String, Object> parameters) {
         HttpEntity<Object> requestEntity = new HttpEntity<>(new HttpHeaders());
-        return makeAndSendRequest(rest
-                .exchange(path, HttpMethod.GET, requestEntity, Object.class, parameters));
+        ResponseEntity<Object> statServerResponse;
+        try {
+            statServerResponse = rest
+                    .exchange(path, HttpMethod.GET, requestEntity, Object.class, parameters);
+        } catch (HttpStatusCodeException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
+        }
+        return prepareResponse(statServerResponse);
     }
 
     private <T> ResponseEntity<Object> post(String path, T body) {
         HttpEntity<Object> requestEntity = new HttpEntity<>(body);
-        return makeAndSendRequest(rest
-                .exchange(path, HttpMethod.POST, requestEntity, Object.class));
-    }
-
-    private ResponseEntity<Object> makeAndSendRequest(ResponseEntity<Object> responseEntity) {
         ResponseEntity<Object> statServerResponse;
         try {
-            statServerResponse = responseEntity;
+            statServerResponse = rest
+                    .exchange(path, HttpMethod.POST, requestEntity, Object.class);
         } catch (HttpStatusCodeException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
         }
