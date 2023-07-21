@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.event.dto.EventDto;
 import ru.practicum.event.dto.FullEventResponseDto;
 import ru.practicum.event.dto.GetEventDto;
+import ru.practicum.requests.dto.EventRequestsPatchDto;
+import ru.practicum.requests.dto.FullRequestsDto;
+import ru.practicum.requests.dto.ex.StatusListFullRequestDto;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -48,6 +51,23 @@ public class EventController {
                                            @RequestBody @Valid EventDto eventDto) {
         log.debug("GET /users/{}/events.", userId);
         return eventService.patchEvent(userId, eventId, eventDto);
+    }
+
+    @GetMapping("/{eventId}/requests")
+    @ResponseStatus(HttpStatus.OK)
+    public List<FullRequestsDto> getRequests(@PathVariable Long userId,
+                                             @PathVariable Long eventId) {
+        log.debug("GET /users/{}/events.", userId);
+        return eventService.getRequests(userId, eventId);
+    }
+
+    @PatchMapping("/{eventId}/requests")
+    @ResponseStatus(HttpStatus.OK)
+    public StatusListFullRequestDto patchRequests(@PathVariable Long userId,
+                                                  @PathVariable Long eventId,
+                                                  @RequestBody @Valid EventRequestsPatchDto dto) {
+        log.debug("GET /users/{}/events.", userId);
+        return eventService.patchRequests(userId, eventId, dto);
     }
 
 }

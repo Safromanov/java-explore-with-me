@@ -1,6 +1,7 @@
 package ru.practicum.requests;
 
 import org.springframework.stereotype.Service;
+import ru.practicum.requests.dto.EventRequestDto;
 
 import java.time.LocalDateTime;
 

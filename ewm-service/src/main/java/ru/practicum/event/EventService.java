@@ -12,6 +12,12 @@ import ru.practicum.event.dto.GetEventDto;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.EventMapper;
 import ru.practicum.requests.EventRequestRepository;
+import ru.practicum.requests.Status;
+import ru.practicum.requests.dto.EventRequestsPatchDto;
+import ru.practicum.requests.dto.FullRequestsDto;
+import ru.practicum.requests.dto.ex.ConfirmList;
+import ru.practicum.requests.dto.ex.RejectList;
+import ru.practicum.requests.dto.ex.StatusListFullRequestDto;
 import ru.practicum.user.model.User;
 import ru.practicum.user.model.UserRepository;
 
@@ -67,5 +73,20 @@ public class EventService {
         modelMapper.map(eventDto, event);
         event = eventRepository.save(event);
         return EventMapper.toFullEventResponseDto(event, 0, 0);
+    }
+
+    public List<FullRequestsDto> getRequests(Long userId, Long eventId) {
+        return eventRequestRepository.findAllByEvent_InitiatorIdAndEventId(userId, eventId);
+    }
+
+    public StatusListFullRequestDto patchRequests(Long userId, Long eventId, EventRequestsPatchDto dto) {
+        eventRequestRepository.findByIdIn(userId, eventId, dto.getRequestIds()).stream()
+                .map(x -> {
+                    x.setStatus(dto.getStatus());
+                    return eventRequestRepository.save(x);
+                });
+        if (dto.getStatus() == Status.CONFIRMED)
+            return new ConfirmList(eventRequestRepository.findDtoByIdIn(userId, eventId, dto.getRequestIds()));
+        return new RejectList(eventRequestRepository.findDtoByIdIn(userId, eventId, dto.getRequestIds()));
     }
 }

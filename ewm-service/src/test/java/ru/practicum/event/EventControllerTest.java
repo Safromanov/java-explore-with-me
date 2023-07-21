@@ -19,8 +19,14 @@ import ru.practicum.event.model.Action;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.Location;
 import ru.practicum.event.model.State;
+import ru.practicum.requests.EventRequest;
+import ru.practicum.requests.EventRequestRepository;
+import ru.practicum.requests.Status;
+import ru.practicum.requests.dto.EventRequestsPatchDto;
 import ru.practicum.user.model.User;
 import ru.practicum.user.model.UserRepository;
+
+import java.time.LocalDateTime;
 
 import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,6 +41,9 @@ class EventControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private UserRepository userRepository;
+
+    User user;
+
     @Autowired
     private CategoryRepository categoryRepository;
     @Autowired
@@ -42,10 +51,13 @@ class EventControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
     private final EasyRandom easyRandom = new EasyRandom();
+    Event event;
+    @Autowired
+    private EventRequestRepository eventRequestRepository;
 
     @BeforeEach
     void setUp() {
-        User user = new User();
+        user = new User();
         user.setId(1L);
         user.setName("testUser");
         user.setEmail("test@user.net");
@@ -55,7 +67,7 @@ class EventControllerTest {
         category.setName("testCategory");
         category = categoryRepository.save(category);
 
-        Event event = easyRandom.nextObject(Event.class);
+        event = easyRandom.nextObject(Event.class);
         Location location = new Location();
         location.setLon(0.121F);
         location.setLat(0.1212F);
@@ -67,6 +79,7 @@ class EventControllerTest {
         eventRepository.save(event);
         event.setId(2L);
         eventRepository.save(event);
+        event.setId(1L);
     }
 
     @Test
@@ -116,6 +129,40 @@ class EventControllerTest {
         var requestBuilder = MockMvcRequestBuilders.patch("/users/1/events/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(eventDto));
+        var mvcResult = this.mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isOk(),
+                        openApi().isValid("static/ewm-main-service-spec.json")
+                ).andReturn();
+        System.out.println(mvcResult.getResponse().getContentAsString());
+    }
+
+
+    @Test
+    void getRequests() throws Exception {
+        EventRequest eventRequest = new EventRequest(1L, user, event, LocalDateTime.now().minusDays(1), Status.PENDING);
+        eventRequestRepository.save(eventRequest);
+
+        var requestBuilder = MockMvcRequestBuilders.get("/users/1/events/1/requests")
+                .contentType(MediaType.APPLICATION_JSON);
+        var mvcResult = this.mockMvc.perform(requestBuilder)
+                .andExpectAll(
+                        status().isOk(),
+                        openApi().isValid("static/ewm-main-service-spec.json")
+                ).andReturn();
+        System.out.println(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    void patchRequests() throws Exception {
+        EventRequest eventRequest = new EventRequest(1L, user, event, LocalDateTime.now().minusDays(1), Status.PENDING);
+        eventRequestRepository.save(eventRequest);
+
+        EventRequestsPatchDto patchDto = new EventRequestsPatchDto(new long[]{1L}, Status.REJECTED);
+
+        var requestBuilder = MockMvcRequestBuilders.patch("/users/1/events/1/requests")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(patchDto));
         var mvcResult = this.mockMvc.perform(requestBuilder)
                 .andExpectAll(
                         status().isOk(),

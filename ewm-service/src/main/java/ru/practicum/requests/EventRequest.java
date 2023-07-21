@@ -3,6 +3,7 @@ package ru.practicum.requests;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.practicum.event.model.Event;
 import ru.practicum.user.model.User;
 
@@ -29,6 +30,6 @@ public class EventRequest {
     private Event event;
 
     private LocalDateTime created;
-
+    @Setter
     private Status status;
 }
