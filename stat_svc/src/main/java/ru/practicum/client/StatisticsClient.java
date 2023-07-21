@@ -7,8 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import ru.practicum.model.dto.ClientStatDto;
 import ru.practicum.model.dto.HitDto;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -21,13 +23,13 @@ public class StatisticsClient {
         this.rest = rest;
     }
 
-    public ResponseEntity<Object> getStaticsForUri(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
-        Map<String, Object> parameters = Map.of("start", start, "end", end, "uris", uris, "unique", unique);
-        return get("/stats", parameters);
+    public ResponseEntity<Object> getStaticsForUri(ClientStatDto clientStatDto) {
+        //  Map<String, Object> parameters = Map.of("start", start, "end", end, "uris", uris, "unique", unique);
+        return get("/stats", clientStatDto.toMap());
     }
 
-    public ResponseEntity<Object> addHit(String appName, String uri, String ip, LocalDateTime timestamp) {
-        HitDto hitDto = new HitDto(appName, uri, ip, timestamp);
+    public ResponseEntity<Object> addHit(String appName, HttpServletRequest request) {
+        HitDto hitDto = new HitDto(appName, request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
         return post("/hit", hitDto);
     }
 
@@ -65,7 +67,6 @@ public class StatisticsClient {
         if (response.hasBody()) {
             return responseBuilder.body(response.getBody());
         }
-
         return responseBuilder.build();
     }
 }
