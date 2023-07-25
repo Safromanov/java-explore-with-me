@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @AllArgsConstructor
 @Getter
@@ -13,7 +14,9 @@ import javax.validation.constraints.NotBlank;
 public class CreateUserDto {
 
     @NotBlank
+    @Size(min = 6, max = 50)
     private String name;
     @Email
+    @NotBlank
     private String email;
 }

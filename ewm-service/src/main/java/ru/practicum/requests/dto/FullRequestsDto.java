@@ -3,7 +3,7 @@ package ru.practicum.requests.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Value;
-import ru.practicum.requests.Status;
+import ru.practicum.requests.model.Status;
 
 import java.time.LocalDateTime;
 

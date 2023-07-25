@@ -3,9 +3,9 @@ package ru.practicum.event.model;
 import org.modelmapper.ModelMapper;
 import ru.practicum.category.Category;
 import ru.practicum.category.dto.ResponseCategoryDto;
-import ru.practicum.event.dto.EventDto;
+import ru.practicum.event.dto.EventCreateReqDto;
+import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.FullEventResponseDto;
-import ru.practicum.event.dto.GetEventDto;
 import ru.practicum.user.model.User;
 import ru.practicum.user.model.dto.UserShortDto;
 
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class EventMapper {
     private static final ModelMapper modelMapper = new ModelMapper();
 
-    public static Event createDtoToEvent(EventDto eventDto, User initiator, Category category) {
+    public static Event createDtoToEvent(EventCreateReqDto eventDto, User initiator, Category category) {
         Event event = new Event();
 
         event.setInitiator(initiator);
@@ -59,8 +59,8 @@ public class EventMapper {
         return fullEventResponseDto;
     }
 
-    public static GetEventDto toGetEventDto(Event event, User initiator, int confirmedRequests, int views) {
-        GetEventDto eventDto = new GetEventDto();
+    public static EventShortDto toGetEventDto(Event event, User initiator, int confirmedRequests, int views) {
+        EventShortDto eventDto = new EventShortDto();
         eventDto.setId(event.getId());
         eventDto.setInitiator(modelMapper.map(initiator, UserShortDto.class));
         eventDto.setAnnotation(event.getAnnotation());

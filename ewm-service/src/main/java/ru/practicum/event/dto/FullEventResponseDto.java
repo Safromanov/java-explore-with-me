@@ -36,4 +36,6 @@ public class FullEventResponseDto {
     private State state;
     private long views;
 
+    private Boolean publishedOn;
+
 }

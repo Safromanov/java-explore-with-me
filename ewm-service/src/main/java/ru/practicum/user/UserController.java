@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -24,10 +25,11 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDto> getUsers(@RequestParam(defaultValue = "0") int from,
+    public List<UserDto> getUsers(@RequestParam(required = false) Set<Long> ids,
+                                  @RequestParam(defaultValue = "0") int from,
                                   @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
         log.debug("GET /admin/users");
-        return userService.getUsers(from, size);
+        return userService.getUsers(ids, from, size);
     }
 
     @PostMapping()
