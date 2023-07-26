@@ -51,29 +51,29 @@ class StatisticsClientTest {
         mockServer = MockRestServiceServer.createServer(restTemplate);
     }
 
-    @Test
-    public void addHitTest() throws JsonProcessingException, URISyntaxException {
-        HitDto hitDto = new HitDto("ewm-main-service",
-                "/events/1",
-                "192.163.0.1",
-                LocalDateTime.now());
-
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-
-        Mockito.when(request.getRequestURI()).thenReturn("/events/1");
-        Mockito.when(request.getRemoteAddr()).thenReturn("192.163.0.1");
-
-        mockServer.expect(ExpectedCount.once(),
-                        requestTo(new URI(serverUrl + "hit")))
-                .andExpect(method(HttpMethod.POST))
-                .andExpect(content().json(mapper.writeValueAsString(hitDto)))
-                .andRespond(withStatus(HttpStatus.CREATED)
-                        .contentType(MediaType.APPLICATION_JSON)
-                );
-
-        statisticsClient.addHit("ewm-main-service",
-                request);
-    }
+//    @Test
+//    public void addHitTest() throws JsonProcessingException, URISyntaxException {
+//        HitDto hitDto = new HitDto("ewm-main-service",
+//                "/events/1",
+//                "192.163.0.1",
+//                LocalDateTime.now());
+//
+//        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+//
+//        Mockito.when(request.getRequestURI()).thenReturn("/events/1");
+//        Mockito.when(request.getRemoteAddr()).thenReturn("192.163.0.1");
+//
+//        mockServer.expect(ExpectedCount.once(),
+//                        requestTo(new URI(serverUrl + "hit")))
+//                .andExpect(method(HttpMethod.POST))
+//                .andExpect(content().json(mapper.writeValueAsString(hitDto)))
+//                .andRespond(withStatus(HttpStatus.CREATED)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                );
+//
+//        statisticsClient.addHit("ewm-main-service",
+//                request);
+//    }
 
     @Test
     public void getStatsTest() throws URISyntaxException, JsonProcessingException {

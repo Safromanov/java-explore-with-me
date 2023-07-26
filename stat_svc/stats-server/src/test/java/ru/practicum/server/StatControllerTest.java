@@ -44,7 +44,7 @@ public class StatControllerTest {
         this.mockMvc.perform(requestBuilder)
                 .andExpectAll(
                         status().isCreated(),
-                        openApi().isValid("static/ewm-stats-service-spec.json")
+                        openApi().isValid("src/main/resources/static/ewm-stats-service-spec.json")
                 );
     }
 
@@ -104,7 +104,7 @@ public class StatControllerTest {
         this.mockMvc.perform(requestBuilder)
                 .andExpectAll(
                         status().isCreated(),
-                        openApi().isValid("static/ewm-stats-service-spec.json")
+                        openApi().isValid("src/main/resources/static/ewm-stats-service-spec.json")
                 );
     }
 }

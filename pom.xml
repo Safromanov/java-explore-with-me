@@ -14,7 +14,6 @@
     <modules>
         <module>stat_svc</module>
         <module>ewm-service</module>
-        <module>stat_svc/server</module>
     </modules>
 
     <groupId>ru.practicum</groupId>
