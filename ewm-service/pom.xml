@@ -1,16 +1,17 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>ru.practicum</groupId>
         <artifactId>explore-with-me</artifactId>
         <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>stat_svc</artifactId>
+    <artifactId>ewm-service</artifactId>
     <packaging>jar</packaging>
 
-    <name>stat_svc</name>
+    <name>ewm-service</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -69,7 +70,6 @@
         <dependency>
             <groupId>com.atlassian.oai</groupId>
             <artifactId>swagger-request-validator-mockmvc</artifactId>
-<!--            <version>2.35.1</version>-->
             <scope>test</scope>
         </dependency>
         <dependency>
