@@ -45,6 +45,7 @@ public class EventMapper {
 
         fullEventResponseDto.setCreatedOn(event.getCreatedOn());
         fullEventResponseDto.setEventDate(event.getEventDate());
+        fullEventResponseDto.setPublishedOn(event.getPublishedOn());
         fullEventResponseDto.setPaid(event.getPaid());
         fullEventResponseDto.setLocation(event.getLocation());
 

@@ -4,9 +4,6 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import ru.practicum.event.dto.FullEventResponseDto;
-import ru.practicum.event.model.Event;
-import ru.practicum.event.model.State;
 import ru.practicum.requests.dto.EventRequestDto;
 import ru.practicum.requests.model.EventRequest;
 
@@ -26,12 +23,12 @@ public class ModelMapperConfiguration {
         });
 
 
-        mapper.addMappings(new PropertyMap<Event, FullEventResponseDto>() {
-            @Override
-            protected void configure() {
-                using(context -> context.getSource() == State.PUBLISHED).map(source.getState(), destination.getPublishedOn());
-            }
-        });
+//        mapper.addMappings(new PropertyMap<Event, FullEventResponseDto>() {
+//            @Override
+//            protected void configure() {
+//                using(context -> context.getSource() == State.PUBLISHED).map(source.getState(), destination.getPublishedOn());
+//            }
+//        });
 
         return mapper;
     }

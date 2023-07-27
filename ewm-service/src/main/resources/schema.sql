@@ -30,6 +30,7 @@ CREATE TABLE events
     description        VARCHAR(10000),
     created_on         TIMESTAMP WITHOUT TIME ZONE,
     event_date         TIMESTAMP WITHOUT TIME ZONE,
+    published_on       TIMESTAMP WITHOUT TIME ZONE,
     location_id        BIGINT REFERENCES locations (id),
     paid               BOOLEAN,
     participant_limit  INTEGER                                 NOT NULL,

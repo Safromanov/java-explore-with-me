@@ -32,6 +32,7 @@ public class Event {
     private String description;
     private LocalDateTime createdOn;
     private LocalDateTime eventDate;
+    private LocalDateTime publishedOn;
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "location_id")
     private Location location;

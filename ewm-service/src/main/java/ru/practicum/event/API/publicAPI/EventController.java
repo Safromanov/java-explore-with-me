@@ -8,6 +8,7 @@ import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.FullEventResponseDto;
 import ru.practicum.event.model.SortEvent;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
@@ -32,17 +33,18 @@ public class EventController {
                                                 @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                                 @RequestParam(required = false) SortEvent sort,
                                                 @RequestParam(defaultValue = "0") int from,
-                                                @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
+                                                @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
+                                                HttpServletRequest request) {
         log.debug("GET /events with params: {}, {}, {}, {}, {}, {}, {}, {}, {}.",
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
-        return eventService.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        return eventService.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request);
     }
 
     @GetMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
-    public FullEventResponseDto getEventsByParam(@PathVariable long eventId) {
+    public FullEventResponseDto getEventsByParam(@PathVariable long eventId, HttpServletRequest request) {
         log.debug("GET /events/{}.", eventId);
-        return eventService.getEvent(eventId);
+        return eventService.getEvent(eventId, request);
     }
 
 }
