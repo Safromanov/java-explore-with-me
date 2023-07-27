@@ -6,14 +6,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.event.EventRepository;
-import ru.practicum.event.UtilService;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.FullEventResponseDto;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.SortEvent;
 import ru.practicum.event.model.State;
+import ru.practicum.event.util.UtilService;
 import ru.practicum.exceptionHandler.NotFoundException;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +31,8 @@ public class EventService {
 
     public List<EventShortDto> getEventsByParam(String text, Set<Long> categories, Boolean paid,
                                                 LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                                boolean onlyAvailable, SortEvent sort, int from, int size) {
+                                                boolean onlyAvailable, SortEvent sort, int from, int size,
+                                                HttpServletRequest request) {
         PageRequest pageRequest = getPageRequest(from, size);
         if (sort == SortEvent.EVENT_DATE) pageRequest.withSort(Sort.by("eventDate"));
 
@@ -48,11 +50,11 @@ public class EventService {
         return PageRequest.of(from > 0 ? from / size : 0, size);
     }
 
-    public FullEventResponseDto getEvent(long eventId) {
+    public FullEventResponseDto getEvent(long eventId, HttpServletRequest request) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event dont found"));
         if (event.getState() != State.PUBLISHED) throw new NotFoundException("Event dont found");
         FullEventResponseDto dto = modelMapper.map(event, FullEventResponseDto.class);
-        dto.setViews(utilService.findViews());
+        //   dto.setViews(utilService.findViews(eventId));
         return dto;
     }
 }

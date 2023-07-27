@@ -17,7 +17,7 @@ import ru.practicum.category.Category;
 import ru.practicum.event.dto.EventCreateReqDto;
 import ru.practicum.event.dto.View;
 import ru.practicum.event.model.Event;
-import ru.practicum.event.model.StateAction;
+import ru.practicum.event.model.StateUserAction;
 import ru.practicum.requests.EventRequestRepository;
 import ru.practicum.requests.dto.EventRequestsPatchDto;
 import ru.practicum.requests.model.EventRequest;
@@ -94,7 +94,7 @@ class PrivateEventControllerTest {
         EventCreateReqDto eventDto = easyRandom.nextObject(EventCreateReqDto.class);
         eventDto.setDescription("update update update update update update update update update update");
         eventDto.setCategory(1);
-        eventDto.setStateAction(StateAction.SEND_TO_REVIEW);
+        eventDto.setStateAction(StateUserAction.SEND_TO_REVIEW);
         var requestBuilder = MockMvcRequestBuilders.patch("/users/1/events/2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(eventDto));
@@ -131,7 +131,7 @@ class PrivateEventControllerTest {
     void patchRequests() throws Exception {
         User user = entityManager.find(User.class, 1L);
         Event event = entityManager.find(Event.class, 1L);
-        EventRequest eventRequest = new EventRequest(1L, user, event, LocalDateTime.now().minusDays(1), Status.PENDING);
+        EventRequest eventRequest = new EventRequest(3L, user, event, LocalDateTime.now().minusDays(1), Status.PENDING);
         eventRequest = eventRequestRepository.save(eventRequest);
 
         EventRequestsPatchDto patchDto = new EventRequestsPatchDto(Collections.singleton(eventRequest.getId()), Status.CONFIRMED);

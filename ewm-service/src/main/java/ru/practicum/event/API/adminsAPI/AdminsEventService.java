@@ -56,9 +56,10 @@ public class AdminsEventService {
         if (dto.getStateAction() != null) {
             switch (dto.getStateAction()) {
                 case PUBLISH_EVENT:
-                    if (event.getState().equals(State.PENDING))
+                    if (event.getState().equals(State.PENDING)) {
                         event.setState(State.PUBLISHED);
-                    else
+                        event.setPublishedOn(LocalDateTime.now());
+                    } else
                         throw new ConflictException("Cannot publish the event because it's not in the right state: " + event.getState());
                     break;
                 case REJECT_EVENT:

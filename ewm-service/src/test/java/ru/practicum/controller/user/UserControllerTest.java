@@ -38,7 +38,7 @@ class UserControllerTest {
     @Test
     void postUser() throws Exception {
 
-        CreateUserDto createUserDto = new CreateUserDto("abc", "ayf@be.cu");
+        CreateUserDto createUserDto = new CreateUserDto("abcdfdd", "ayf@be.cu");
 
         var requestBuilder = MockMvcRequestBuilders.post("/admin/users").contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(createUserDto));
