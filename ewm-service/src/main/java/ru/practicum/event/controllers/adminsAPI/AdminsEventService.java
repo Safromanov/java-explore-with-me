@@ -1,6 +1,7 @@
-package ru.practicum.event.API.adminsAPI;
+package ru.practicum.event.controllers.adminsAPI;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -11,8 +12,12 @@ import ru.practicum.event.dto.UpdateEventAdminRequest;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.SortEvent;
 import ru.practicum.event.model.State;
+import ru.practicum.event.util.UtilService;
+import ru.practicum.exceptionHandler.BadRequestException;
 import ru.practicum.exceptionHandler.ConflictException;
 import ru.practicum.exceptionHandler.NotFoundException;
+import ru.practicum.requests.EventRequestRepository;
+import ru.practicum.requests.model.EventRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,10 +26,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AdminsEventService {
 
     private final EventRepository eventRepository;
     private final ModelMapper modelMapper;
+    private final UtilService utilService;
+    private final EventRequestRepository eventRequestRepository;
 
     public List<FullEventResponseDto> getEventsByParam(String text, Set<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, SortEvent sort, int from, int size) {
         PageRequest pageRequest = getPageRequest(from, size);
@@ -36,10 +44,12 @@ public class AdminsEventService {
         } else {
             eventsByParam = eventRepository.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, pageRequest);
         }
-
-        return eventsByParam.stream().map(event -> {
+        var statViews = utilService.findViews(eventsByParam);
+        log.info("StatViews " + statViews.toString());
+        return   eventsByParam.stream().map(event -> {
             var responseDto = modelMapper.map(event, FullEventResponseDto.class);
-            if (event.getState() == State.CANCELED) responseDto.setParticipantLimit(0);
+            responseDto.setConfirmedRequests(eventRequestRepository.countByStatusConfirmed(event.getId()));
+          //  responseDto.setViews(utilService.findViews(event.getId()));
             return responseDto;
         }).collect(Collectors.toList());
     }
@@ -51,6 +61,7 @@ public class AdminsEventService {
     public FullEventResponseDto patchEvent(long eventId, UpdateEventAdminRequest dto) {
         if (dto.getParticipantLimit() != null)
             if (dto.getParticipantLimit() == 0) dto.setParticipantLimit(null);
+
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event dont found"));
         modelMapper.map(dto, event);
         if (dto.getStateAction() != null) {

@@ -12,6 +12,6 @@ public interface StatisticsService {
 
     List<GetStatDto> getStatistics(LocalDateTime start,
                                    LocalDateTime end,
-                                   String[] uris,
+                                   List<String> uris,
                                    boolean unique);
 }

@@ -18,7 +18,7 @@ public class EventPatchUserDto {
     private String annotation;
 
     private long category;
-    @Size(min = 20, max = 15000)
+    @Size(min = 20, max = 7000)
     private String description;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;

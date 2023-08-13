@@ -1,4 +1,4 @@
-package ru.practicum.event.API.publicAPI;
+package ru.practicum.event.controllers.publicAPI;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.FullEventResponseDto;
 import ru.practicum.event.model.SortEvent;
+import ru.practicum.exceptionHandler.BadRequestException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Max;
@@ -33,17 +34,20 @@ public class EventController {
                                                 @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                                 @RequestParam(required = false) SortEvent sort,
                                                 @RequestParam(defaultValue = "0") int from,
-                                                @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
+                                                @RequestParam(defaultValue = "10") @Min(1) int size,
                                                 HttpServletRequest request) {
-        log.debug("GET /events with params: {}, {}, {}, {}, {}, {}, {}, {}, {}.",
+        log.info("GET /events with params: {}, {}, {}, {}, {}, {}, {}, {}, {}.",
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        if (rangeStart != null && rangeEnd != null)
+            if (rangeStart.isAfter(rangeEnd))
+                throw new BadRequestException("Field: eventDate. The event must start no later than the current time.");
         return eventService.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request);
     }
 
     @GetMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
-    public FullEventResponseDto getEventsByParam(@PathVariable long eventId, HttpServletRequest request) {
-        log.debug("GET /events/{}.", eventId);
+    public FullEventResponseDto getEvent(@PathVariable long eventId, HttpServletRequest request) {
+        log.info("GET /events/{}.", eventId);
         return eventService.getEvent(eventId, request);
     }
 

@@ -1,10 +1,13 @@
 package ru.practicum.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import ru.practicum.event.model.Location;
 import ru.practicum.event.model.StateUserAction;
 
@@ -17,25 +20,29 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @JsonView(View.Post.class)
-public class EventCreateReqDto {
+@ToString
+public class EventCreateDto {
     @NotBlank
     @Size(min = 20, max = 2000)
+    @ToString.Exclude
     private String annotation;
     @NotNull
+    @ToString.Exclude
     private long category;
     @NotBlank
     @Size(min = 20, max = 15000)
+    @ToString.Exclude
     private String description;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @NotNull
     private LocalDateTime eventDate;
     @NotNull
     private Location location;
-    @NotNull
+    @JsonProperty(defaultValue = "false")
     private Boolean paid;
-
+    @JsonProperty(defaultValue = "0")
     private int participantLimit;
-    @NotNull
+    @JsonProperty(defaultValue = "true")
     private Boolean requestModeration;
     @NotBlank
     @Size(min = 3, max = 120)

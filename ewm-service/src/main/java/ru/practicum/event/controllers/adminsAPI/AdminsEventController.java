@@ -1,4 +1,4 @@
-package ru.practicum.event.API.adminsAPI;
+package ru.practicum.event.controllers.adminsAPI;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.event.dto.FullEventResponseDto;
 import ru.practicum.event.dto.UpdateEventAdminRequest;
 import ru.practicum.event.model.SortEvent;
+import ru.practicum.exceptionHandler.BadRequestException;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
@@ -33,15 +35,19 @@ public class AdminsEventController {
                                                        @RequestParam(required = false) SortEvent sort,
                                                        @RequestParam(defaultValue = "0") int from,
                                                        @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
-        log.debug("GET /admin/events with params: {}, {}, {}, {}, {}, {}, {}, {}, {}.",
+        log.info("GET /admin/events with params: {}, {}, {}, {}, {}, {}, {}, {}, {}.",
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
         return eventService.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
     }
 
     @PatchMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
-    public FullEventResponseDto patchEvent(@PathVariable long eventId, @RequestBody UpdateEventAdminRequest dto) {
-        log.debug("PATCH /admin/events/{} with dto: {}.", eventId, dto);
+    public FullEventResponseDto patchEvent(@PathVariable long eventId, @RequestBody @Valid UpdateEventAdminRequest dto) {
+        log.info("PATCH /admin/events/{} with dto: {}.", eventId, dto);
+        if (dto.getEventDate() != null) {
+            if (dto.getEventDate().isBefore(LocalDateTime.now()))
+                throw new BadRequestException("Field: eventDate. The event must start no later than current time.");
+        }
         return eventService.patchEvent(eventId, dto);
     }
 }

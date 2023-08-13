@@ -10,9 +10,12 @@ import ru.practicum.dto.GetStatDto;
 import ru.practicum.dto.HitDto;
 import ru.practicum.server.service.StatisticsServiceImpl;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -22,24 +25,31 @@ public class StatController {
 
     private final StatisticsServiceImpl statisticsService;
 
-    @PostMapping("/hit")
+    @PostMapping(value = "/hit", consumes = "application/json")
     public ResponseEntity<Object> addStatisticalData(@RequestBody @Valid HitDto hitDto) {
-        log.debug("POST /hit with dto: {}.", hitDto);
+        log.info("POST /hit with dto: {}.", hitDto);
         statisticsService.addStatisticalData(hitDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
-    public List<GetStatDto> getStatistics(@RequestParam LocalDateTime start,
-                                          @RequestParam LocalDateTime end,
-                                          @RequestParam(required = false) String[] uris,
-                                          @RequestParam(defaultValue = "false") boolean unique) {
-        log.debug("GET /stats with params: {}, {}, {}, {}", start, end, uris, unique);
-        if (start.isAfter(end)) {
-            throw new IllegalArgumentException("Start must be before end");
-        }
-        return statisticsService.getStatistics(start, end, uris, unique);
+    public List<GetStatDto> getStatistics(@RequestParam(defaultValue = "2020-05-05 00:00:00") LocalDateTime start,
+                                          @RequestParam(defaultValue = "3020-05-05 00:00:00") LocalDateTime end,
+                                          @RequestParam(required = false) List<String> uris,
+                                          @RequestParam(defaultValue = "false") boolean unique, HttpServletRequest request) {
+        log.info("Query " + request.getQueryString());
+        log.info("GET /stats with params: {}, {}, {}, {}", start, end,
+                uris.stream().map(s -> "'" + s + "'").collect(Collectors.joining(",")
+                ), unique);
+
+        if (start != null && end != null)
+            if (start.isAfter(end)) {
+                throw new IllegalArgumentException("Start must be before end");
+            }
+        List<GetStatDto> res = statisticsService.getStatistics(start, end, uris, unique);
+        log.info("result:" + res.toString());
+        return res;
     }
 }
 

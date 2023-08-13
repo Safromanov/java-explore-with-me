@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.category.Category;
-import ru.practicum.event.dto.EventCreateReqDto;
+import ru.practicum.event.dto.EventCreateDto;
 import ru.practicum.event.dto.View;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.StateUserAction;
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class PrivateEventControllerTest {
+class UsersEventControllerTest {
 
 
     @Autowired
@@ -51,7 +51,7 @@ class PrivateEventControllerTest {
     @Transactional
     void postEvent_returnStatusCreate() throws Exception {
         Category category = entityManager.find(Category.class, 1L);
-        EventCreateReqDto eventDto = easyRandom.nextObject(EventCreateReqDto.class);
+        EventCreateDto eventDto = easyRandom.nextObject(EventCreateDto.class);
         eventDto.setDescription("Test_test_test_test_test_test_test_test_test_test");
         eventDto.setCategory(category.getId());
         var requestBuilder = MockMvcRequestBuilders.post("/users/1/events")
@@ -91,7 +91,7 @@ class PrivateEventControllerTest {
     @Test
     void patchEvent_returnStatusOK() throws Exception {
 
-        EventCreateReqDto eventDto = easyRandom.nextObject(EventCreateReqDto.class);
+        EventCreateDto eventDto = easyRandom.nextObject(EventCreateDto.class);
         eventDto.setDescription("update update update update update update update update update update");
         eventDto.setCategory(1);
         eventDto.setStateAction(StateUserAction.SEND_TO_REVIEW);

@@ -23,21 +23,21 @@ public class ErrorHandler {
     @ExceptionHandler(ConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleConflictExceptionException(ConflictException e) {
-        log.warn(e.getMessage() + "\n" + Arrays.stream(e.getStackTrace()).map(s -> s.toString()).collect(Collectors.joining("\n")));
+        log.warn(e.getMessage());
         return new ErrorResponse(StatusExceptionsEnum.FORBIDDEN, e.getMessage());
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundExceptionException(NotFoundException e) {
-        log.warn(e.getMessage() + "\n" + Arrays.stream(e.getStackTrace()).map(s -> s.toString()).collect(Collectors.joining("\n")));
+        log.warn(e.getMessage());
         return new ErrorResponse(StatusExceptionsEnum.NOT_FOUND, e.getMessage());
     }
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleNotBadRequestException(BadRequestException e) {
-        log.warn(e.getMessage() + "\n" + Arrays.stream(e.getStackTrace()).map(s -> s.toString()).collect(Collectors.joining("\n")));
+        log.warn(e.getMessage());
         return new ErrorResponse(StatusExceptionsEnum.BAD_REQUEST, e.getMessage());
     }
 
@@ -52,7 +52,6 @@ public class ErrorHandler {
                     return new Violation(error.getField(), error.getDefaultMessage());
                 })
                 .collect(Collectors.toList());
-        // log.warn(e.getMessage()+ "\n" + Arrays.stream(e.getStackTrace()).map(s -> s.toString()).collect(Collectors.joining("\n")))
         return new ValidationErrorResponse(violations);
     }
 
@@ -70,7 +69,6 @@ public class ErrorHandler {
                         }
                 )
                 .collect(Collectors.toList());
-        //  log.warn(e.getMessage()+ "\n" + Arrays.stream(e.getStackTrace()).map(s -> s.toString()).collect(Collectors.joining("\n")))
         return new ValidationErrorResponse(violations);
     }
 }

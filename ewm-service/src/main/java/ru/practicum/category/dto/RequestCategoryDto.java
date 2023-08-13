@@ -14,6 +14,6 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 public class RequestCategoryDto {
     @NotBlank
-    @Size(min = 6, max = 50)
+    @Size(min = 3, max = 50)
     private String name;
 }

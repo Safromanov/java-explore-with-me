@@ -15,14 +15,14 @@ public interface StatDataRepository extends JpaRepository<StatData, Long> {
             "and  s.timestamp > ?1 and s.timestamp < ?2 " +
             "GROUP BY s.app, s.uri " +
             "order by count(s) desc ")
-    List<GetStatDto> getStatisticForUris(LocalDateTime start, LocalDateTime end, String[] uris);
+    List<GetStatDto> getStatisticForUris(LocalDateTime start, LocalDateTime end, List<String> uris);
 
     @Query("SELECT new ru.practicum.dto.GetStatDto(s.app, s.uri,  count(distinct s.ip)) " +
             "FROM StatData s where s.uri in ?3  " +
             "and  s.timestamp > ?1 and s.timestamp < ?2 " +
             "GROUP BY s.app, s.uri " +
             "order by count(distinct s.ip) desc")
-    List<GetStatDto> getStatisticForUrisWithUniqueIp(LocalDateTime start, LocalDateTime end, String[] uris);
+    List<GetStatDto> getStatisticForUrisWithUniqueIp(LocalDateTime start, LocalDateTime end, List<String> uris);
 
 
     @Query("SELECT new ru.practicum.dto.GetStatDto(s.app, s.uri,  count(s.id)) " +

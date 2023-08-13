@@ -1,13 +1,14 @@
-package ru.practicum.event.API.privateAPI;
+package ru.practicum.event.controllers.usersAPI;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.category.Category;
 import ru.practicum.category.CategoryRepository;
 import ru.practicum.event.EventRepository;
-import ru.practicum.event.dto.EventCreateReqDto;
+import ru.practicum.event.dto.EventCreateDto;
 import ru.practicum.event.dto.EventPatchUserDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.FullEventResponseDto;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class PrivateEventService {
+public class UsersEventService {
 
     private final EventRepository eventRepository;
 
@@ -46,7 +47,7 @@ public class PrivateEventService {
 
     private final ModelMapper modelMapper;
 
-    public FullEventResponseDto postEvent(EventCreateReqDto eventDto, Long userId) {
+    public FullEventResponseDto postEvent(EventCreateDto eventDto, Long userId) {
         User initiator = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User dont found"));
 
         Category category = categoryRepository.findById(eventDto.getCategory())
@@ -57,9 +58,10 @@ public class PrivateEventService {
         return EventMapper.toFullEventResponseDto(event, 0, 0);
     }
 
-    public List<EventShortDto> getEvents(long userId) {
+    public List<EventShortDto> getEvents(long userId, int from, int size) {
+        PageRequest pageRequest = getPageRequest(from, size);
         User initiator = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User dont found"));
-        return eventRepository.findAll().stream().map((x) ->
+        return eventRepository.findAll(pageRequest).stream().map((x) ->
                 EventMapper.toGetEventDto(x, initiator, 0, 0)).collect(Collectors.toList());
     }
 
@@ -85,16 +87,16 @@ public class PrivateEventService {
             throw new ConflictException("Only pending or canceled events can be changed");
         modelMapper.map(eventDto, event);
         event = eventRepository.save(event);
-        switch (eventDto.getStateAction()) {
-            case CANCEL_REVIEW:
-                event.setState(State.CANCELED);
-                break;
-            case SEND_TO_REVIEW:
-                event.setState(State.PENDING);
-                break;
-        }
+        if (eventDto.getStateAction() != null)
+            switch (eventDto.getStateAction()) {
+                case CANCEL_REVIEW:
+                    event.setState(State.CANCELED);
+                    break;
+                case SEND_TO_REVIEW:
+                    event.setState(State.PENDING);
+                    break;
+            }
         var responseDto = EventMapper.toFullEventResponseDto(event, 0, 0);
-        if (event.getState() == State.CANCELED) responseDto.setParticipantLimit(0);
         return responseDto;
     }
 
@@ -104,7 +106,6 @@ public class PrivateEventService {
 
     public StatusListRequestDto patchRequests(Long userId, Long eventId, EventRequestsPatchDto dto) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User dont found"));
-
         Event event = eventRepository.findByInitiatorIdAndId(userId, eventId)
                 .orElseThrow(() -> new NotFoundException("Event dont found"));
 
@@ -114,7 +115,7 @@ public class PrivateEventService {
 
         int countConfirmed = eventRequestRepository.countByStatusConfirmed(eventId);
 
-        List<EventRequest> eventRequests = eventRequestRepository.findByIdIn(userId, dto.getRequestIds());
+        List<EventRequest> eventRequests = eventRequestRepository.findByIdIn(eventId, dto.getRequestIds());
 
         if (countConfirmed >= event.getParticipantLimit())
             throw new ConflictException("The participant limit has been reached");
@@ -122,13 +123,18 @@ public class PrivateEventService {
         for (var eventRequest : eventRequests) {
             if (eventRequest.getStatus() != Status.PENDING)
                 throw new ConflictException("Status can be changed only for requests that are in the pending state");
-            if (countConfirmed < event.getParticipantLimit()) {
+            if (countConfirmed < event.getParticipantLimit() || dto.getStatus() == Status.REJECTED) {
                 eventRequest.setStatus(dto.getStatus());
-                countConfirmed++;
+                if (dto.getStatus() == Status.CONFIRMED)
+                    countConfirmed++;
             } else eventRequest.setStatus(Status.REJECTED);
             eventRequestRepository.save(eventRequest);
         }
         return new StatusListRequestDto(eventRequestRepository.findConfirmDtoByIdIn(eventId, dto.getRequestIds()),
                 eventRequestRepository.findRejectedDtoByIdIn(eventId, dto.getRequestIds()));
+    }
+
+    private PageRequest getPageRequest(int from, int size) {
+        return PageRequest.of(from > 0 ? from / size : 0, size);
     }
 }

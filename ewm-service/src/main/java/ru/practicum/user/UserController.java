@@ -27,7 +27,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getUsers(@RequestParam(required = false) Set<Long> ids,
                                   @RequestParam(defaultValue = "0") int from,
-                                  @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
+                                  @RequestParam(defaultValue = "10") @Min(1) @Max(100000) int size) {
         log.debug("GET /admin/users");
         return userService.getUsers(ids, from, size);
     }

@@ -2,10 +2,7 @@ package ru.practicum.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.practicum.category.dto.ResponseCategoryDto;
 import ru.practicum.event.model.Location;
 import ru.practicum.event.model.State;
@@ -17,12 +14,15 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 public class FullEventResponseDto {
 
     private Long id;
     private UserShortDto initiator;
+    @ToString.Exclude
     private String annotation;
     private ResponseCategoryDto category;
+    @ToString.Exclude
     private String description;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdOn;

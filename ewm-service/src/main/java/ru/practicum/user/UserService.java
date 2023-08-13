@@ -25,6 +25,10 @@ public class UserService {
 
     public List<UserDto> getUsers(Set<Long> ids, int from, int size) {
         PageRequest pageRequest = getPageRequest(from, size);
+//        if (ids == null||ids.isEmpty())
+//            return userRepository.findAll(pageRequest).stream()
+//                .map(x -> modelMapper.map(x, UserDto.class))
+//                .collect(Collectors.toList());
         return userRepository.findByIdIn(ids, pageRequest).stream()
                 .map(x -> modelMapper.map(x, UserDto.class))
                 .collect(Collectors.toList());
@@ -35,9 +39,8 @@ public class UserService {
         try {
             user = userRepository.save(modelMapper.map(createUserDto, User.class));
         } catch (Exception e) {
-            throw new ConflictException("exist");
+            throw new ConflictException("Name or email already exist");
         }
-
 
         return modelMapper.map(user, UserDto.class);
     }

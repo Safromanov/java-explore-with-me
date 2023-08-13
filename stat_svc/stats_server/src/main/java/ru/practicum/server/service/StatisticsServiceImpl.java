@@ -1,6 +1,7 @@
 package ru.practicum.server.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.dto.GetStatDto;
@@ -15,6 +16,7 @@ import java.util.List;
 @Service
 @Validated
 @RequiredArgsConstructor
+@Slf4j
 public class StatisticsServiceImpl implements StatisticsService {
 
     private final StatDataRepository statDataRepository;
@@ -28,9 +30,11 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public List<GetStatDto> getStatistics(LocalDateTime start,
                                           LocalDateTime end,
-                                          String[] uris,
+                                          List<String> uris,
                                           boolean unique) {
-        if (uris == null || uris.length == 0) {
+        for (var a: uris)
+            log.info("URI" + a);
+        if (uris == null || uris.isEmpty()) {
             if (unique)
                 return statDataRepository.getStatisticUniqueIp(start, end);
             return statDataRepository.getStatistic(start, end);

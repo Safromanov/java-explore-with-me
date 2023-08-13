@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.requests.dto.EventRequestDto;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
 import java.util.List;
 
@@ -21,10 +22,10 @@ public class EventRequestsController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventRequestDto postEventRequest(@PathVariable @Min(1) long userId,
-                                            @RequestParam @Min(1) long eventId) {
-        log.debug("POST /users/{}/requests with eventId: {}.", userId, eventId);
-        return eventRequestService.postEventRequest(userId, eventId);
+    public EventRequestDto postEventRequest(@PathVariable  long userId,
+                                            @RequestParam  long eventId, HttpServletRequest request) {
+        log.info("POST  {} with eventId: {}.", request.getRequestURI(), eventId);
+        return eventRequestService.postNewEventRequest(userId, eventId);
     }
 
     @GetMapping

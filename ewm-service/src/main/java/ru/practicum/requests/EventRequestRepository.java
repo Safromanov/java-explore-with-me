@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface EventRequestRepository extends JpaRepository<EventRequest, Long> {
+
+    Optional<EventRequest> findByRequesterIdAndEventId(long requesterId, long eventId);
     List<EventRequest> findByRequesterId(Long id);
 
     Optional<EventRequest> findByRequesterIdAndId(long requesterId, long eventRequestId);

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.practicum.event.API.privateAPI.PrivateEventService;
+import ru.practicum.event.controllers.usersAPI.UsersEventService;
 import ru.practicum.requests.dto.EventRequestsPatchDto;
 import ru.practicum.requests.model.Status;
 
@@ -16,8 +16,8 @@ import java.util.Collections;
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class PrivateEventServiceTest {
-    private final PrivateEventService eventService;
+public class UsersEventServiceTest {
+    private final UsersEventService eventService;
     private final ObjectMapper objectMapper;
 
     @Test

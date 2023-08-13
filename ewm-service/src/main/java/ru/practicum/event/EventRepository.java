@@ -40,7 +40,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND (:categories IS NULL OR e.category.id in :categories) " +
             "AND (:paid IS NULL OR e.paid = :paid) " +
             "AND (:rangeStart IS NULL OR e.eventDate >= :rangeStart) " +
-            "AND (e.state = ru.practicum.event.model.State.PUBLISHED) " +
             "AND (:rangeEnd IS NULL OR e.eventDate <= :rangeEnd)")
     List<Event> getEventsByParam(@Param("text") String text,
                                  @Param("categories") Set<Long> categories,

@@ -41,4 +41,8 @@ public class Event {
     private Boolean requestModeration;
     private String title;
     private State state;
+
+    public String getUri() {
+        return "/events/" + id;
+    }
 }

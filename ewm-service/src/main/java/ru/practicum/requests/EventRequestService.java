@@ -1,10 +1,13 @@
 package ru.practicum.requests;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import ru.practicum.event.EventRepository;
 import ru.practicum.event.model.Event;
+import ru.practicum.event.model.State;
+import ru.practicum.exceptionHandler.ConflictException;
 import ru.practicum.exceptionHandler.NotFoundException;
 import ru.practicum.requests.dto.EventRequestDto;
 import ru.practicum.requests.model.EventRequest;
@@ -18,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EventRequestService {
 
     private final EventRequestRepository eventRequestRepository;
@@ -26,15 +30,29 @@ public class EventRequestService {
     private final ModelMapper modelMapper;
 
 
-    public EventRequestDto postEventRequest(long userId, long eventId) {
+    public EventRequestDto postNewEventRequest(long userId, long eventId) {
         User requester = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User dont found"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event dont found"));
+        if (event.getState() != State.PUBLISHED)
+            throw new ConflictException("Event is not published");
+        int confirmRequests = eventRequestRepository.countByStatusConfirmed(eventId);
+        log.info("Запросы и Лимит "+confirmRequests + " " + event.getParticipantLimit());
+        if (event.getParticipantLimit() <= confirmRequests && event.getParticipantLimit() != 0)
+            throw new ConflictException("Event is full");
+        if (requester.getId().equals(event.getInitiator().getId()))
+            throw new ConflictException("You can't request to your event");
+        eventRequestRepository.findByRequesterIdAndEventId(userId, eventId).ifPresent((x) -> {
+            throw new ConflictException("Request already exist");
+        });
+
 
         EventRequest eventRequest = new EventRequest();
         eventRequest.setCreated(LocalDateTime.now());
         eventRequest.setRequester(requester);
         eventRequest.setEvent(event);
-        eventRequest.setStatus(Status.PENDING);
+        if (event.getParticipantLimit() != 0 && event.getRequestModeration())
+            eventRequest.setStatus(Status.PENDING);
+        else eventRequest.setStatus(Status.CONFIRMED);
 
         eventRequest = eventRequestRepository.save(eventRequest);
 
@@ -55,7 +73,7 @@ public class EventRequestService {
         EventRequest eventRequest = eventRequestRepository
                 .findByRequesterIdAndId(requesterId, eventRequestId)
                 .orElseThrow(() -> new NotFoundException("User dont found"));
-        eventRequest.setStatus(Status.REJECTED);
+        eventRequest.setStatus(Status.CANCELED);
         return modelMapper.map(eventRequestRepository.save(eventRequest), EventRequestDto.class);
     }
 }
