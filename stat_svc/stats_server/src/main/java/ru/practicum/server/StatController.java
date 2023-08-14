@@ -33,22 +33,16 @@ public class StatController {
 
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
-    public List<GetStatDto> getStatistics(@RequestParam(defaultValue = "2020-05-05 00:00:00") LocalDateTime start,
-                                          @RequestParam(defaultValue = "3020-05-05 00:00:00") LocalDateTime end,
-                                          @RequestParam(required = false) List<String> uris,
-                                          @RequestParam(defaultValue = "false") boolean unique, HttpServletRequest request) {
+    public List<GetStatDto> getStatistics(@RequestParam(defaultValue = "1972-05-05 00:00:00") LocalDateTime start, @RequestParam(defaultValue = "3020-05-05 00:00:00") LocalDateTime end, @RequestParam(required = false) List<String> uris, @RequestParam(defaultValue = "false") boolean unique, HttpServletRequest request) {
         log.info("Query " + request.getQueryString());
-        log.info("GET /stats with params: {}, {}, {}, {}", start, end,
-                uris.stream().map(s -> "'" + s + "'").collect(Collectors.joining(",")
-                ), unique);
+        log.info("GET /stats with params: {}, {}, {}, {}", start, end, uris.stream().map(s -> "'" + s + "'").collect(Collectors.joining(",")), unique);
 
-        if (start != null && end != null)
-            if (start.isAfter(end)) {
-                throw new IllegalArgumentException("Start must be before end");
-            }
-        List<GetStatDto> res = statisticsService.getStatistics(start, end, uris, unique);
-        log.info("result:" + res.toString());
-        return res;
+        if (start != null && end != null) if (start.isAfter(end)) {
+            throw new IllegalArgumentException("Start must be before end");
+        }
+        if ((start.getYear() == 1972 && end.getYear() != 3020) || (end.getYear() == 3020 && start.getYear() != 1972))
+            throw new BadRequestException("Incorrect time range");
+        return statisticsService.getStatistics(start, end, uris, unique);
     }
 }
 
