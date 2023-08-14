@@ -13,7 +13,6 @@ import ru.practicum.server.service.StatisticsServiceImpl;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -3,6 +3,7 @@ package ru.practicum.event.controllers.publicAPI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -38,14 +39,14 @@ public class EventService {
         PageRequest pageRequest = getPageRequest(from, size);
         if (sort == SortEvent.EVENT_DATE) pageRequest.withSort(Sort.by("eventDate"));
 
-        List<Event> eventsByParam;
+        Page<Event> eventsByParam;
         if (onlyAvailable) {
             eventsByParam = eventRepository.getAvailableEventsByParam(text, categories, paid, rangeStart, rangeEnd, pageRequest);
         } else {
             eventsByParam = eventRepository.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, pageRequest);
         }
         utilService.addHit(request);
-        return eventsByParam.stream().map(event -> modelMapper.map(event, EventShortDto.class)).collect(Collectors.toList());
+        return eventsByParam.get().map(event -> modelMapper.map(event, EventShortDto.class)).collect(Collectors.toList());
     }
 
 
@@ -56,7 +57,7 @@ public class EventService {
         Map<Long, Long> views = utilService.findViews(List.of(event));
         log.info(views.toString());
         utilService.addHit(request);
-        dto.setViews(views.isEmpty()? 0 : views.get(eventId));
+        dto.setViews(!views.containsKey(eventId) ? 0 : views.get(eventId));
         return dto;
     }
 

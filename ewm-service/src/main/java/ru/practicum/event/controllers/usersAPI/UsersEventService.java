@@ -125,7 +125,7 @@ public class UsersEventService {
         for (var eventRequest : eventRequests) {
             if (eventRequest.getStatus() != Status.PENDING)
                 throw new ConflictException("Status can be changed only for requests that are in the pending state");
-            if (countConfirmed < event.getParticipantLimit() || event.getParticipantLimit()  == 0) {
+            if (countConfirmed < event.getParticipantLimit() || event.getParticipantLimit() == 0) {
                 eventRequest.setStatus(dto.getStatus());
                 if (dto.getStatus() == Status.CONFIRMED)
                     countConfirmed++;

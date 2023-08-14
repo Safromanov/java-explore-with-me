@@ -5,18 +5,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.dto.ClientStatDto;
 import ru.practicum.dto.GetStatDto;
 import ru.practicum.dto.HitDto;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;

@@ -22,8 +22,8 @@ public class EventRequestsController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventRequestDto postEventRequest(@PathVariable  long userId,
-                                            @RequestParam  long eventId, HttpServletRequest request) {
+    public EventRequestDto postEventRequest(@PathVariable long userId,
+                                            @RequestParam long eventId, HttpServletRequest request) {
         log.info("POST Event Request  {} with eventId: {}.", request.getRequestURI(), eventId);
         return eventRequestService.postNewEventRequest(userId, eventId);
     }

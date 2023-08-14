@@ -1,5 +1,6 @@
 package ru.practicum.event;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -8,10 +9,11 @@ import org.springframework.lang.Nullable;
 import ru.practicum.event.model.Event;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
-
 
 
     Optional<Event> findByInitiatorIdAndId(Long id, Long id1);
@@ -28,7 +30,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "GROUP BY e " +
             "HAVING count(r) < e.participantLimit"
     )
-    List<Event> getAvailableEventsByParam(@Param("text") String text,
+    Page<Event> getAvailableEventsByParam(@Param("text") String text,
                                           @Param("categories") Set<Long> categories,
                                           @Param("paid") Boolean paid,
                                           @Param("rangeStart") LocalDateTime rangeStart,
@@ -39,13 +41,13 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "WHERE (:text IS NULL OR e.description like %:text% OR e.annotation like %:text%)  " +
             "AND (:categories IS NULL OR e.category.id in :categories) " +
             "AND (:paid IS NULL OR e.paid = :paid) " +
-            "AND (:rangeStart IS NULL OR e.eventDate >= :rangeStart) " +
-            "AND (:rangeEnd IS NULL OR e.eventDate <= :rangeEnd)")
-    List<Event> getEventsByParam(@Param("text") String text,
+            "AND CAST(COALESCE(:rangeStart, '1970-01-01') as timestamp)  <= e.eventDate  " +
+            "AND CAST(COALESCE(:rangeEnd, '3038-01-19')  as timestamp) >= e.eventDate")
+    Page<Event> getEventsByParam(@Param("text") String text,
                                  @Param("categories") Set<Long> categories,
                                  @Nullable @Param("paid") Boolean paid,
-                                 @Param("rangeStart") LocalDateTime rangeStart,
-                                 @Param("rangeEnd") LocalDateTime rangeEnd,
+                                 @Nullable @Param("rangeStart") LocalDateTime rangeStart,
+                                 @Nullable @Param("rangeEnd") LocalDateTime rangeEnd,
                                  Pageable pageable);
 
     @Query("select e from Event e where e.id in ?1")

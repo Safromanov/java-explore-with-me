@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.compilations.dto.CompilationCreateResponse;
 import ru.practicum.compilations.dto.CompilationDTOPostAdmin;
 import ru.practicum.compilations.dto.Create;
-import ru.practicum.event.dto.FullEventResponseDto;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -30,11 +29,18 @@ public class AdminCompilationsController {
         return adminCompilationsService.createCompilation(compilationDDto, request);
     }
 
-    @PatchMapping
+    @PatchMapping("/{compId}")
     @ResponseStatus(HttpStatus.OK)
     public CompilationCreateResponse updateCompilation(@RequestBody @Valid CompilationDTOPostAdmin compilationDDto,
-                                                       @RequestParam Long compId,  HttpServletRequest request) {
+                                                       @PathVariable Long compId, HttpServletRequest request) {
         log.info("Update Compilation {} with dto: {}.", compId, compilationDDto);
         return adminCompilationsService.updateCompilation(compilationDDto, compId);
+    }
+
+    @DeleteMapping("/{compId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCompilation(@PathVariable Long compId) {
+        log.info("Delete Compilation {}.", compId);
+        adminCompilationsService.deleteCompilation(compId);
     }
 }

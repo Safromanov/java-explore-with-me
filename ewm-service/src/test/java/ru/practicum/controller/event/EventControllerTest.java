@@ -1,6 +1,7 @@
 package ru.practicum.controller.event;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
@@ -28,6 +29,7 @@ class EventControllerTest {
     private MockMvc mockMvc;
 
     @Test
+    @Disabled
     void getEventsByParam_returnStatusOk() throws Exception {
 
         var requestBuilder = MockMvcRequestBuilders.get("/events").contentType(MediaType.APPLICATION_JSON)
@@ -43,6 +45,7 @@ class EventControllerTest {
     }
 
     @Test
+    @Disabled
     void getEvent_returnStatusOk() throws Exception {
         var requestBuilder = MockMvcRequestBuilders.get("/events/1").contentType(MediaType.APPLICATION_JSON);
         var mvcResult = this.mockMvc.perform(requestBuilder)

@@ -41,7 +41,7 @@ public class TestConfig {
         entityManager.merge(category1);
         Category category2 = new Category(2L, "test2Category2");
         entityManager.merge(category2);
-        Category category3 = new Category(3L, "test2Category3");
+        Category category3 = new Category(3L, "test3Category3");
         entityManager.merge(category3);
         entityManager.flush();
     }

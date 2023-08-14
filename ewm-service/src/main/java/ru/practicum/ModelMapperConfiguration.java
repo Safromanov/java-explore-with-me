@@ -22,14 +22,6 @@ public class ModelMapperConfiguration {
             }
         });
 
-
-//        mapper.addMappings(new PropertyMap<Event, FullEventResponseDto>() {
-//            @Override
-//            protected void configure() {
-//                using(context -> context.getSource() == State.PUBLISHED).map(source.getState(), destination.getPublishedOn());
-//            }
-//        });
-
         return mapper;
     }
 

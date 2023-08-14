@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -17,22 +18,19 @@ import ru.practicum.requests.model.Status;
 import ru.practicum.user.model.User;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
 @Import(TestConfig.class)
 class EventRepositoryTest {
 
-    @Autowired
-    private TestEntityManager entityManager;
-
-    @Autowired
-    private EventRepository eventRepository;
-
     private final String findWord = "FIND_ME";
     private final LocalDateTime now = LocalDateTime.now();
     private final Pageable pageable = PageRequest.of(0, 10);
+    @Autowired
+    private TestEntityManager entityManager;
+    @Autowired
+    private EventRepository eventRepository;
 
 //    @Test
 //    void getEventsByParam() {
@@ -59,7 +57,7 @@ class EventRepositoryTest {
         entityManager.merge(eventRequest);
         entityManager.flush();
 
-        List<Event> availableEventsByParam = eventRepository.getAvailableEventsByParam(null, null, null,
+        Page<Event> availableEventsByParam = eventRepository.getAvailableEventsByParam(null, null, null,
                 null, null, pageable);
 
         Event event2 = entityManager.find(Event.class, 2L);

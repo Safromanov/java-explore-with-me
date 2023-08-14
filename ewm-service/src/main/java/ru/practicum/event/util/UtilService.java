@@ -14,8 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +26,7 @@ public class UtilService {
 
     public Map<Long, Long> findViews(List<Event> events) {
 
-        ClientStatDto clientStatDto =  ClientStatDto.builder().unique(true).uris(events.stream().map(Event::getUri).collect(Collectors.toList())).build();
+        ClientStatDto clientStatDto = ClientStatDto.builder().unique(true).uris(events.stream().map(Event::getUri).collect(Collectors.toList())).build();
         log.info("clientStatDto -" + clientStatDto);
         List<GetStatDto> dtoStatList;
         try {
@@ -40,8 +38,9 @@ public class UtilService {
         Map<Long, Long> map = new HashMap<>();
         for (var dto : dtoStatList) {
             String[] parts = dto.getUri().split("/");
-            Long eventId = Long.parseLong(parts[2]);
+            Long eventId = parts.length < 2 ? 0 : Long.parseLong(parts[2]);
             map.put(eventId, dto.getHits());
+            log.info("Full uri -" + dto.getUri() + " key - " + eventId + " val - " + dto.getHits());
         }
         return map;
     }

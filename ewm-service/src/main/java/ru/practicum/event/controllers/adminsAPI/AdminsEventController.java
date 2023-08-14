@@ -1,10 +1,8 @@
 package ru.practicum.event.controllers.adminsAPI;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.event.dto.FullEventResponseDto;
 import ru.practicum.event.dto.UpdateEventAdminRequest;
@@ -40,7 +38,7 @@ public class AdminsEventController {
                                                        @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size, HttpServletRequest request) {
         log.info("GET /admin/events with params: {}.",
                 request.getQueryString());
-        var res =eventService.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        var res = eventService.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
         log.info("Get ADMIN END");
         return res;
     }

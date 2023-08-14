@@ -3,6 +3,7 @@ package ru.practicum.event.controllers.adminsAPI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -14,11 +15,9 @@ import ru.practicum.event.model.Event;
 import ru.practicum.event.model.SortEvent;
 import ru.practicum.event.model.State;
 import ru.practicum.event.util.UtilService;
-import ru.practicum.exceptionHandler.BadRequestException;
 import ru.practicum.exceptionHandler.ConflictException;
 import ru.practicum.exceptionHandler.NotFoundException;
 import ru.practicum.requests.EventRequestRepository;
-import ru.practicum.requests.model.EventRequest;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -40,20 +39,20 @@ public class AdminsEventService {
     public List<FullEventResponseDto> getEventsByParam(String text, Set<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, SortEvent sort, int from, int size) {
         PageRequest pageRequest = getPageRequest(from, size);
         if (sort == SortEvent.EVENT_DATE) pageRequest.withSort(Sort.by("eventDate"));
-
-        List<Event> eventsByParam;
+        Page<Event> eventsByParamPage;
         if (onlyAvailable) {
-            eventsByParam = eventRepository.getAvailableEventsByParam(text, categories, paid, rangeStart, rangeEnd, pageRequest);
+            eventsByParamPage = eventRepository.getAvailableEventsByParam(text, categories, paid, rangeStart, rangeEnd, pageRequest);
         } else {
-            eventsByParam = eventRepository.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, pageRequest);
+            eventsByParamPage = eventRepository.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, pageRequest);
         }
+        log.info("SIZE BD ANSWER MUST BE >0 -" + eventsByParamPage.get().collect(Collectors.toList()).size());
+        List<Event> eventsByParam = eventsByParamPage.get().collect(Collectors.toList());
         var statViews = utilService.findViews(eventsByParam);
         log.info("StatViews " + statViews.toString());
         var views = utilService.findViews(eventsByParam);
-        var listDtoResponse  = eventsByParam.stream().map(event -> {
+        var listDtoResponse = eventsByParam.stream().map(event -> {
             var responseDto = modelMapper.map(event, FullEventResponseDto.class);
             responseDto.setConfirmedRequests(eventRequestRepository.countByStatusConfirmed(event.getId()));
-            log.info("GET ADMIN event {} Количество запросов {} ", event.getId() , eventRequestRepository.countByStatusConfirmed(event.getId()));
             responseDto.setViews(views.containsKey(event.getId()) ? views.get(event.getId()) : 0);
             return responseDto;
         }).collect(Collectors.toList());

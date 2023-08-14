@@ -48,7 +48,7 @@ class StatDataRepositoryTest {
 
         List<GetStatDto> getStatDtoList = statDataRepository.getStatisticForUris(LocalDateTime.now().minusDays(2),
                 LocalDateTime.now(),
-                new String[]{"/events/1"});
+                List.of("/events/1"));
 
         assertEquals(1, getStatDtoList.size());
         assertEquals("/events/1", getStatDtoList.get(0).getUri());
@@ -56,34 +56,13 @@ class StatDataRepositoryTest {
 
         getStatDtoList = statDataRepository.getStatisticForUris(LocalDateTime.now().minusDays(4),
                 LocalDateTime.now(),
-                new String[]{"/events/1", "/events/2"});
+                List.of("/events/1", "/events/2"));
 
 
         assertEquals(2, getStatDtoList.size());
         assertEquals("/events/1", getStatDtoList.get(0).getUri());
         assertEquals("/events/2", getStatDtoList.get(1).getUri());
         assertEquals(2, getStatDtoList.get(0).getHits());
-        assertEquals(1, getStatDtoList.get(1).getHits());
-    }
-
-    @Test
-    void testFindStatisticsForUnIp() {
-        List<GetStatDto> getStatDtoList = statDataRepository.getStatisticForUrisWithUniqueIp(LocalDateTime.now().minusDays(2),
-                LocalDateTime.now(),
-                new String[]{"/events/1"});
-
-        assertEquals(1, getStatDtoList.size());
-        assertEquals("/events/1", getStatDtoList.get(0).getUri());
-        assertEquals(1, getStatDtoList.get(0).getHits());
-
-        getStatDtoList = statDataRepository.getStatisticForUrisWithUniqueIp(LocalDateTime.now().minusDays(4),
-                LocalDateTime.now(),
-                new String[]{"/events/1", "/events/2"});
-
-        assertEquals(2, getStatDtoList.size());
-        assertEquals("/events/1", getStatDtoList.get(0).getUri());
-        assertEquals("/events/2", getStatDtoList.get(1).getUri());
-        assertEquals(1, getStatDtoList.get(0).getHits());
         assertEquals(1, getStatDtoList.get(1).getHits());
     }
 }

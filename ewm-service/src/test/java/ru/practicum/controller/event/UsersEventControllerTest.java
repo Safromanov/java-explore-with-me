@@ -37,9 +37,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UsersEventControllerTest {
 
 
+    private final EasyRandom easyRandom = new EasyRandom();
     @Autowired
     private MockMvc mockMvc;
-    private final EasyRandom easyRandom = new EasyRandom();
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired

@@ -28,9 +28,9 @@ class AdminCategoryServiceTest {
 
     @Test
     void patchCategory_returnConflict() {
-        adminCategoryService.patchCategory(new RequestCategoryDto("Category"), 1);
+        adminCategoryService.patchCategory(new RequestCategoryDto("Categoryv"), 1);
         assertThrows(ConflictException.class, () ->
-                adminCategoryService.patchCategory(new RequestCategoryDto("Category"), 2));
+                adminCategoryService.patchCategory(new RequestCategoryDto("Categoryv"), 2));
     }
 
     @Test

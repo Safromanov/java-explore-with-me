@@ -12,7 +12,6 @@ import ru.practicum.exceptionHandler.errorResponse.ValidationErrorResponse;
 import ru.practicum.exceptionHandler.errorResponse.Violation;
 
 import javax.validation.ConstraintViolationException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 

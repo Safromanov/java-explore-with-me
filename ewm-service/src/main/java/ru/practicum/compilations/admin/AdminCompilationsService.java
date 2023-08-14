@@ -3,6 +3,7 @@ package ru.practicum.compilations.admin;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.compilations.dto.CompilationCreateResponse;
 import ru.practicum.compilations.dto.CompilationDTOPostAdmin;
 import ru.practicum.compilations.model.Compilation;
@@ -17,8 +18,9 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AdminCompilationsService {
-    private  final CompilationRepository compilationRepository;
+    private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
     private final ModelMapper modelMapper;
 
@@ -44,5 +46,11 @@ public class AdminCompilationsService {
         }
         compilation = compilationRepository.save(compilation);
         return modelMapper.map(compilation, CompilationCreateResponse.class);
+    }
+
+    public void deleteCompilation(Long compId) {
+        compilationRepository.findById(compId).ifPresentOrElse(compilationRepository::delete, () -> {
+            throw new NotFoundException("User dont found");
+        });
     }
 }

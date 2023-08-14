@@ -10,7 +10,6 @@ import ru.practicum.event.model.SortEvent;
 import ru.practicum.exceptionHandler.BadRequestException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.List;
