@@ -24,21 +24,21 @@ public class EventRequestsController {
     @ResponseStatus(HttpStatus.CREATED)
     public EventRequestDto postEventRequest(@PathVariable  long userId,
                                             @RequestParam  long eventId, HttpServletRequest request) {
-        log.info("POST  {} with eventId: {}.", request.getRequestURI(), eventId);
+        log.info("POST Event Request  {} with eventId: {}.", request.getRequestURI(), eventId);
         return eventRequestService.postNewEventRequest(userId, eventId);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<EventRequestDto> getEventRequests(@PathVariable @Min(1) long userId) {
-        log.debug("GET /users/{}/requests.", userId);
+        log.info("GET /users/{}/requests.", userId);
         return eventRequestService.getEventRequests(userId);
     }
 
     @PatchMapping("/{eventRequestId}/cancel")
     @ResponseStatus(HttpStatus.OK)
     public EventRequestDto cancelEventRequests(@PathVariable @Min(1) long userId, @PathVariable @Min(1) long eventRequestId) {
-        log.debug("PATCH /users/{}/requests/{}/cancel.", userId, eventRequestId);
+        log.info("PATCH /users/{}/requests/{}/cancel.", userId, eventRequestId);
         return eventRequestService.cancelEventRequests(userId, eventRequestId);
     }
 }

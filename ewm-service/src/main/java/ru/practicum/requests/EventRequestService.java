@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.event.EventRepository;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.State;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class EventRequestService {
 
     private final EventRequestRepository eventRequestRepository;
@@ -36,7 +38,6 @@ public class EventRequestService {
         if (event.getState() != State.PUBLISHED)
             throw new ConflictException("Event is not published");
         int confirmRequests = eventRequestRepository.countByStatusConfirmed(eventId);
-        log.info("Запросы и Лимит "+confirmRequests + " " + event.getParticipantLimit());
         if (event.getParticipantLimit() <= confirmRequests && event.getParticipantLimit() != 0)
             throw new ConflictException("Event is full");
         if (requester.getId().equals(event.getInitiator().getId()))
@@ -55,7 +56,7 @@ public class EventRequestService {
         else eventRequest.setStatus(Status.CONFIRMED);
 
         eventRequest = eventRequestRepository.save(eventRequest);
-
+        log.info("Создан запрос со статусом - {}", eventRequest.getStatus());
         return modelMapper.map(eventRequest, EventRequestDto.class);
     }
 

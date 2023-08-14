@@ -8,11 +8,11 @@ import org.springframework.lang.Nullable;
 import ru.practicum.event.model.Event;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
+
+
 
     Optional<Event> findByInitiatorIdAndId(Long id, Long id1);
 
@@ -47,5 +47,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                  @Param("rangeStart") LocalDateTime rangeStart,
                                  @Param("rangeEnd") LocalDateTime rangeEnd,
                                  Pageable pageable);
+
+    @Query("select e from Event e where e.id in ?1")
+    List<Event> findByIdIn(Set<Long> ids);
 
 }

@@ -36,8 +36,8 @@ public class EventController {
                                                 @RequestParam(defaultValue = "0") int from,
                                                 @RequestParam(defaultValue = "10") @Min(1) int size,
                                                 HttpServletRequest request) {
-        log.info("GET /events with params: {}, {}, {}, {}, {}, {}, {}, {}, {}.",
-                text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        log.info("GET /events with params: {}, .",
+                request.getQueryString());
         if (rangeStart != null && rangeEnd != null)
             if (rangeStart.isAfter(rangeEnd))
                 throw new BadRequestException("Field: eventDate. The event must start no later than the current time.");
@@ -47,7 +47,7 @@ public class EventController {
     @GetMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
     public FullEventResponseDto getEvent(@PathVariable long eventId, HttpServletRequest request) {
-        log.info("GET /events/{}.", eventId);
+        log.info("GET  Event - {}.", request.getRequestURI());
         return eventService.getEvent(eventId, request);
     }
 

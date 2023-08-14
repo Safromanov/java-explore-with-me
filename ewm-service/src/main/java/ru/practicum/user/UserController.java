@@ -35,7 +35,7 @@ public class UserController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto postUser(@RequestBody @Valid CreateUserDto userDto) {
-        log.debug("POST /admin/users with dto: {}.", userDto);
+        log.info("POST /admin/users with dto: {}.", userDto);
         return userService.postUser(userDto);
     }
 

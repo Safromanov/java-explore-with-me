@@ -1,8 +1,10 @@
 package ru.practicum.event.controllers.usersAPI;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.StreamUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -82,7 +84,12 @@ public class UsersEventController {
     public StatusListRequestDto patchRequests(@PathVariable Long userId,
                                               @PathVariable Long eventId,
                                               @RequestBody @Valid EventRequestsPatchDto dto, HttpServletRequest request) {
-        log.info("Patch {} with dto: {}.", request.getRequestURI(), dto);
+        log.info("Patch Request {} with dto: {}.", request.getRequestURI(), dto);
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return usersEventService.patchRequests(userId, eventId, dto);
     }
 

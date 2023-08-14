@@ -1,6 +1,7 @@
 package ru.practicum.event.controllers.usersAPI;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class UsersEventService {
 
     private final EventRepository eventRepository;
@@ -123,12 +125,13 @@ public class UsersEventService {
         for (var eventRequest : eventRequests) {
             if (eventRequest.getStatus() != Status.PENDING)
                 throw new ConflictException("Status can be changed only for requests that are in the pending state");
-            if (countConfirmed < event.getParticipantLimit() || dto.getStatus() == Status.REJECTED) {
+            if (countConfirmed < event.getParticipantLimit() || event.getParticipantLimit()  == 0) {
                 eventRequest.setStatus(dto.getStatus());
                 if (dto.getStatus() == Status.CONFIRMED)
                     countConfirmed++;
             } else eventRequest.setStatus(Status.REJECTED);
             eventRequestRepository.save(eventRequest);
+            log.info("Request {} status changed to {}", eventRequest.getId(), eventRequest.getStatus());
         }
         return new StatusListRequestDto(eventRequestRepository.findConfirmDtoByIdIn(eventId, dto.getRequestIds()),
                 eventRequestRepository.findRejectedDtoByIdIn(eventId, dto.getRequestIds()));

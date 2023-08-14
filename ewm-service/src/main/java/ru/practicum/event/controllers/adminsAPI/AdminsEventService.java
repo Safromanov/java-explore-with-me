@@ -6,6 +6,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.event.EventRepository;
 import ru.practicum.event.dto.FullEventResponseDto;
 import ru.practicum.event.dto.UpdateEventAdminRequest;
@@ -20,6 +21,7 @@ import ru.practicum.requests.EventRequestRepository;
 import ru.practicum.requests.model.EventRequest;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class AdminsEventService {
 
     private final EventRepository eventRepository;
@@ -46,12 +49,16 @@ public class AdminsEventService {
         }
         var statViews = utilService.findViews(eventsByParam);
         log.info("StatViews " + statViews.toString());
-        return   eventsByParam.stream().map(event -> {
+        var views = utilService.findViews(eventsByParam);
+        var listDtoResponse  = eventsByParam.stream().map(event -> {
             var responseDto = modelMapper.map(event, FullEventResponseDto.class);
             responseDto.setConfirmedRequests(eventRequestRepository.countByStatusConfirmed(event.getId()));
-          //  responseDto.setViews(utilService.findViews(event.getId()));
+            log.info("GET ADMIN event {} Количество запросов {} ", event.getId() , eventRequestRepository.countByStatusConfirmed(event.getId()));
+            responseDto.setViews(views.containsKey(event.getId()) ? views.get(event.getId()) : 0);
             return responseDto;
         }).collect(Collectors.toList());
+        if (sort == SortEvent.EVENT_DATE) eventsByParam.sort(Comparator.comparing(Event::getEventDate));
+        return listDtoResponse;
     }
 
     private PageRequest getPageRequest(int from, int size) {

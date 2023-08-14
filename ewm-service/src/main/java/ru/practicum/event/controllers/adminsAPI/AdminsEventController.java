@@ -1,14 +1,17 @@
 package ru.practicum.event.controllers.adminsAPI;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.event.dto.FullEventResponseDto;
 import ru.practicum.event.dto.UpdateEventAdminRequest;
 import ru.practicum.event.model.SortEvent;
 import ru.practicum.exceptionHandler.BadRequestException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -34,10 +37,12 @@ public class AdminsEventController {
                                                        @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                                        @RequestParam(required = false) SortEvent sort,
                                                        @RequestParam(defaultValue = "0") int from,
-                                                       @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
-        log.info("GET /admin/events with params: {}, {}, {}, {}, {}, {}, {}, {}, {}.",
-                text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
-        return eventService.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+                                                       @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size, HttpServletRequest request) {
+        log.info("GET /admin/events with params: {}.",
+                request.getQueryString());
+        var res =eventService.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        log.info("Get ADMIN END");
+        return res;
     }
 
     @PatchMapping("/{eventId}")
