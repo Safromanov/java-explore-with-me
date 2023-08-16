@@ -59,10 +59,8 @@ public class EventServiceImpl implements EventService {
         } else {
             eventsByParamPage = eventRepository.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, pageRequest);
         }
-        log.info("SIZE BD ANSWER MUST BE >0 -" + eventsByParamPage.get().collect(Collectors.toList()).size());
         List<Event> eventsByParam = eventsByParamPage.get().collect(Collectors.toList());
         var statViews = utilService.findViews(eventsByParam);
-        log.info("StatViews " + statViews.toString());
         var views = utilService.findViews(eventsByParam);
         var listDtoResponse = eventsByParam.stream().map(event -> {
             var responseDto = modelMapper.map(event, FullEventResponseDto.class);
@@ -129,10 +127,9 @@ public class EventServiceImpl implements EventService {
     public FullEventResponseDto getEventPublic(long eventId, HttpServletRequest request) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event dont found"));
         if (event.getState() != State.PUBLISHED) throw new NotFoundException("Event dont found");
-        FullEventResponseDto dto = modelMapper.map(event, FullEventResponseDto.class);
-        Map<Long, Long> views = utilService.findViews(List.of(event));
-        log.info(views.toString());
         utilService.addHit(request);
+        Map<Long, Long> views = utilService.findViews(List.of(event));
+        FullEventResponseDto dto = modelMapper.map(event, FullEventResponseDto.class);
         dto.setViews(!views.containsKey(eventId) ? 0 : views.get(eventId));
         return dto;
     }
@@ -228,5 +225,4 @@ public class EventServiceImpl implements EventService {
         return new StatusListRequestDto(eventRequestRepository.findConfirmDtoByIdIn(eventId, dto.getRequestIds()),
                 eventRequestRepository.findRejectedDtoByIdIn(eventId, dto.getRequestIds()));
     }
-
 }
