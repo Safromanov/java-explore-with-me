@@ -1,4 +1,4 @@
-package ru.practicum.event.controllers.usersAPI;
+package ru.practicum.event.controllers.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +9,7 @@ import ru.practicum.event.dto.EventCreateDto;
 import ru.practicum.event.dto.EventPatchUserDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.FullEventResponseDto;
+import ru.practicum.event.service.EventServiceImpl;
 import ru.practicum.exceptionHandler.BadRequestException;
 import ru.practicum.requests.dto.EventRequestsPatchDto;
 import ru.practicum.requests.dto.FullRequestsDto;
@@ -27,7 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class UsersEventController {
-    private final UsersEventService usersEventService;
+    private final EventServiceImpl eventService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -35,7 +36,7 @@ public class UsersEventController {
         log.info("POST {} with dto: {}.", request.getRequestURI(), eventDto);
         if (eventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2)))
             throw new BadRequestException("Field: eventDate. The event must start no later than 2 hours from the current time.");
-        return usersEventService.createEvent(eventDto, userId);
+        return eventService.createEvent(eventDto, userId);
     }
 
     @GetMapping
@@ -44,14 +45,14 @@ public class UsersEventController {
                                          @RequestParam(defaultValue = "0") int from,
                                          @RequestParam(defaultValue = "10") @Min(1) int size) {
         log.info("GET /users/{}/events.", userId);
-        return usersEventService.getEvents(userId, from, size);
+        return eventService.getEventsForUser(userId, from, size);
     }
 
     @GetMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
     public FullEventResponseDto getEvent(@PathVariable Long userId, @PathVariable Long eventId) {
         log.info("GET /users/{}/events.", userId);
-        return usersEventService.getEvent(userId, eventId);
+        return eventService.getEventForUser(userId, eventId);
     }
 
     @PatchMapping("/{eventId}")
@@ -63,7 +64,7 @@ public class UsersEventController {
         if (eventDto.getEventDate() != null)
             if (eventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2)))
                 throw new BadRequestException("Field: eventDate. The event must start no later than 2 hours from the current time.");
-        return usersEventService.updateEvent(userId, eventId, eventDto);
+        return eventService.updateEventForUser(userId, eventId, eventDto);
     }
 
     @GetMapping("/{eventId}/requests")
@@ -71,7 +72,7 @@ public class UsersEventController {
     public List<FullRequestsDto> getRequestForEvent(@PathVariable @Positive Long userId,
                                                     @PathVariable @Positive Long eventId) {
         log.info("GET /users/{}/events.", userId);
-        return usersEventService.getRequestForEvent(userId, eventId);
+        return eventService.getRequestForEvent(userId, eventId);
     }
 
     @PatchMapping("/{eventId}/requests")
@@ -80,7 +81,7 @@ public class UsersEventController {
                                                      @PathVariable @Positive Long eventId,
                                                      @RequestBody @Valid EventRequestsPatchDto dto, HttpServletRequest request) {
         log.info("Patch Request {} with dto: {}.", request.getRequestURI(), dto);
-        return usersEventService.changeStatusRequests(userId, eventId, dto);
+        return eventService.changeStatusRequests(userId, eventId, dto);
     }
 
 }

@@ -1,8 +1,8 @@
 package ru.practicum.event.model;
 
 import org.modelmapper.ModelMapper;
-import ru.practicum.category.Category;
 import ru.practicum.category.dto.ResponseCategoryDto;
+import ru.practicum.category.model.Category;
 import ru.practicum.event.dto.EventCreateDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.FullEventResponseDto;

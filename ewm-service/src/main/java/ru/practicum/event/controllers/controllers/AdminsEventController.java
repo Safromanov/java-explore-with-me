@@ -1,4 +1,4 @@
-package ru.practicum.event.controllers.adminsAPI;
+package ru.practicum.event.controllers.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.event.dto.FullEventResponseDto;
 import ru.practicum.event.dto.UpdateEventAdminRequest;
 import ru.practicum.event.model.SortEvent;
+import ru.practicum.event.service.EventServiceImpl;
 import ru.practicum.exceptionHandler.BadRequestException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +24,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AdminsEventController {
 
-    private final AdminsEventService eventService;
+    private final EventServiceImpl eventService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -38,7 +39,7 @@ public class AdminsEventController {
                                                        @RequestParam(defaultValue = "10") @Positive int size, HttpServletRequest request) {
         log.info("GET /admin/events with params: {}.",
                 request.getQueryString());
-        var res = eventService.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        var res = eventService.getEventsByParamForAdmin(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
         log.info("Get ADMIN END");
         return res;
     }
@@ -53,4 +54,6 @@ public class AdminsEventController {
         }
         return eventService.updateEvent(eventId, dto);
     }
+
+
 }

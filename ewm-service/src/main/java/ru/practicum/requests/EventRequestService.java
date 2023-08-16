@@ -45,14 +45,7 @@ public class EventRequestService {
             throw new ConflictException("Event is full");
         if (requester.getId().equals(event.getInitiator().getId()))
             throw new ConflictException("You can't request to your event");
-        EventRequest eventRequest = new EventRequest();
-        eventRequest.setCreated(LocalDateTime.now());
-        eventRequest.setRequester(requester);
-        eventRequest.setEvent(event);
-        if (event.getParticipantLimit() != 0 && event.getRequestModeration())
-            eventRequest.setStatus(Status.PENDING);
-        else eventRequest.setStatus(Status.CONFIRMED);
-
+        EventRequest eventRequest = dtoToEventRequest(requester, event);
         eventRequest = eventRequestRepository.save(eventRequest);
         log.info("Создан запрос со статусом - {}", eventRequest.getStatus());
         return modelMapper.map(eventRequest, EventRequestDto.class);
@@ -73,5 +66,16 @@ public class EventRequestService {
                 .orElseThrow(() -> new NotFoundException("User dont found"));
         eventRequest.setStatus(Status.CANCELED);
         return modelMapper.map(eventRequestRepository.save(eventRequest), EventRequestDto.class);
+    }
+
+    private EventRequest dtoToEventRequest(User requester, Event event) {
+        EventRequest eventRequest = new EventRequest();
+        eventRequest.setCreated(LocalDateTime.now());
+        eventRequest.setRequester(requester);
+        eventRequest.setEvent(event);
+        if (event.getParticipantLimit() != 0 && event.getRequestModeration())
+            eventRequest.setStatus(Status.PENDING);
+        else eventRequest.setStatus(Status.CONFIRMED);
+        return eventRequest;
     }
 }

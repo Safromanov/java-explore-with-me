@@ -4,7 +4,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.category.Category;
+import ru.practicum.category.model.Category;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.Location;
 import ru.practicum.event.model.State;

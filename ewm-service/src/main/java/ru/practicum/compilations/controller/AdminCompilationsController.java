@@ -1,4 +1,4 @@
-package ru.practicum.compilations.admin;
+package ru.practicum.compilations.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.compilations.dto.CompilationCreateResponse;
 import ru.practicum.compilations.dto.CompilationDtoReq;
 import ru.practicum.compilations.dto.Create;
+import ru.practicum.compilations.service.CompilationsServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -20,14 +21,14 @@ import javax.validation.constraints.Positive;
 @Validated
 public class AdminCompilationsController {
 
-    private final AdminCompilationsService adminCompilationsService;
+    private final CompilationsServiceImpl compilationsService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CompilationCreateResponse createCompilation(@RequestBody @Validated(Create.class) @Valid CompilationDtoReq compilationDDto,
                                                        HttpServletRequest request) {
         log.info("Create Compilation {} with dto: {}.", request.getRequestURI(), compilationDDto);
-        return adminCompilationsService.createCompilation(compilationDDto, request);
+        return compilationsService.createCompilation(compilationDDto, request);
     }
 
     @PatchMapping("/{compId}")
@@ -35,13 +36,13 @@ public class AdminCompilationsController {
     public CompilationCreateResponse updateCompilation(@RequestBody @Valid CompilationDtoReq compilationDDto,
                                                        @PathVariable @Positive Long compId) {
         log.info("Update Compilation {} with dto: {}.", compId, compilationDDto);
-        return adminCompilationsService.updateCompilation(compilationDDto, compId);
+        return compilationsService.updateCompilation(compilationDDto, compId);
     }
 
     @DeleteMapping("/{compId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCompilation(@PathVariable @Positive Long compId) {
         log.info("Delete Compilation {}.", compId);
-        adminCompilationsService.deleteCompilation(compId);
+        compilationsService.deleteCompilation(compId);
     }
 }

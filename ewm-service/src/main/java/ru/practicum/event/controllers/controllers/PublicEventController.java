@@ -1,4 +1,4 @@
-package ru.practicum.event.controllers.publicAPI;
+package ru.practicum.event.controllers.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.FullEventResponseDto;
 import ru.practicum.event.model.SortEvent;
+import ru.practicum.event.service.EventServiceImpl;
 import ru.practicum.exceptionHandler.BadRequestException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +23,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class PublicEventController {
 
-    private final EventService eventService;
+    private final EventServiceImpl eventService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -48,6 +49,6 @@ public class PublicEventController {
     @ResponseStatus(HttpStatus.OK)
     public FullEventResponseDto getEvent(@PathVariable @Positive long eventId, HttpServletRequest request) {
         log.info("GET  Event - {}.", request.getRequestURI());
-        return eventService.getEvent(eventId, request);
+        return eventService.getEventPublic(eventId, request);
     }
 }

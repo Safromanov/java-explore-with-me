@@ -1,10 +1,11 @@
-package ru.practicum.compilations.publics;
+package ru.practicum.compilations.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.compilations.dto.CompilationCreateResponse;
+import ru.practicum.compilations.service.CompilationsServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Positive;
@@ -16,7 +17,7 @@ import java.util.List;
 @RequestMapping("/compilations")
 @RequiredArgsConstructor
 public class PublicCompilationsController {
-    private final PublicCompilationsService compilationsService;
+    private final CompilationsServiceImpl compilationsService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)

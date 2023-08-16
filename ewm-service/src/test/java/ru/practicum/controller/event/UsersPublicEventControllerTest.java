@@ -13,7 +13,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.category.Category;
+import ru.practicum.category.model.Category;
 import ru.practicum.event.dto.EventCreateDto;
 import ru.practicum.event.dto.View;
 import ru.practicum.event.model.Event;

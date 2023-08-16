@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.category.Category;
+import ru.practicum.category.model.Category;
 import ru.practicum.user.model.User;
 
 import javax.persistence.*;

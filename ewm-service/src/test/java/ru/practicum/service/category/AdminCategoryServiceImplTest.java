@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.practicum.category.adminAPI.AdminCategoryService;
 import ru.practicum.category.dto.RequestCategoryDto;
+import ru.practicum.category.service.CategoryServiceImpl;
 import ru.practicum.exceptionHandler.ConflictException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -14,10 +14,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class AdminCategoryServiceTest {
+class AdminCategoryServiceImplTest {
 
     @Autowired
-    private AdminCategoryService adminCategoryService;
+    private CategoryServiceImpl adminCategoryService;
 
     @Test
     void postCategory_returnConflict() {

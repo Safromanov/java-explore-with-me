@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.user.model.dto.CreateUserDto;
 import ru.practicum.user.model.dto.UserDto;
+import ru.practicum.user.service.UserServiceImpl;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -22,7 +23,7 @@ import java.util.Set;
 @Validated
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)

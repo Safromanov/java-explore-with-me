@@ -1,0 +1,232 @@
+package ru.practicum.event.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.category.CategoryRepository;
+import ru.practicum.category.model.Category;
+import ru.practicum.event.EventRepository;
+import ru.practicum.event.dto.*;
+import ru.practicum.event.model.Event;
+import ru.practicum.event.model.EventMapper;
+import ru.practicum.event.model.SortEvent;
+import ru.practicum.event.model.State;
+import ru.practicum.event.util.UtilService;
+import ru.practicum.exceptionHandler.ConflictException;
+import ru.practicum.exceptionHandler.NotFoundException;
+import ru.practicum.requests.EventRequestRepository;
+import ru.practicum.requests.dto.EventRequestsPatchDto;
+import ru.practicum.requests.dto.FullRequestsDto;
+import ru.practicum.requests.dto.StatusListRequestDto;
+import ru.practicum.requests.model.EventRequest;
+import ru.practicum.requests.model.Status;
+import ru.practicum.user.UserRepository;
+import ru.practicum.user.model.User;
+
+import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+@Transactional
+public class EventServiceImpl implements EventService {
+
+    private final EventRepository eventRepository;
+    private final ModelMapper modelMapper;
+    private final UtilService utilService;
+    private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
+    private final EventRequestRepository eventRequestRepository;
+
+    @Override
+    public List<FullEventResponseDto> getEventsByParamForAdmin(String text, Set<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, SortEvent sort, int from, int size) {
+        PageRequest pageRequest = getPageRequest(from, size);
+        if (sort == SortEvent.EVENT_DATE) pageRequest.withSort(Sort.by("eventDate"));
+        Page<Event> eventsByParamPage;
+        if (onlyAvailable) {
+            eventsByParamPage = eventRepository.getAvailableEventsByParam(text, categories, paid, rangeStart, rangeEnd, pageRequest);
+        } else {
+            eventsByParamPage = eventRepository.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, pageRequest);
+        }
+        log.info("SIZE BD ANSWER MUST BE >0 -" + eventsByParamPage.get().collect(Collectors.toList()).size());
+        List<Event> eventsByParam = eventsByParamPage.get().collect(Collectors.toList());
+        var statViews = utilService.findViews(eventsByParam);
+        log.info("StatViews " + statViews.toString());
+        var views = utilService.findViews(eventsByParam);
+        var listDtoResponse = eventsByParam.stream().map(event -> {
+            var responseDto = modelMapper.map(event, FullEventResponseDto.class);
+            responseDto.setConfirmedRequests(eventRequestRepository.countByStatusConfirmed(event.getId()));
+            responseDto.setViews(views.containsKey(event.getId()) ? views.get(event.getId()) : 0);
+            return responseDto;
+        }).collect(Collectors.toList());
+        if (sort == SortEvent.EVENT_DATE) eventsByParam.sort(Comparator.comparing(Event::getEventDate));
+        return listDtoResponse;
+    }
+
+    private PageRequest getPageRequest(int from, int size) {
+        return PageRequest.of(from > 0 ? from / size : 0, size);
+    }
+
+    @Override
+    public FullEventResponseDto updateEvent(long eventId, UpdateEventAdminRequest dto) {
+        if (dto.getParticipantLimit() != null)
+            if (dto.getParticipantLimit() == 0) dto.setParticipantLimit(null);
+
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event dont found"));
+        modelMapper.map(dto, event);
+        if (dto.getStateAction() != null) {
+            switch (dto.getStateAction()) {
+                case PUBLISH_EVENT:
+                    if (event.getState().equals(State.PENDING)) {
+                        event.setState(State.PUBLISHED);
+                        event.setPublishedOn(LocalDateTime.now());
+                    } else
+                        throw new ConflictException("Cannot publish the event because it's not in the right state: " + event.getState());
+                    break;
+                case REJECT_EVENT:
+                    if (!event.getState().equals(State.PUBLISHED)) {
+                        event.setState(State.CANCELED);
+                    } else
+                        throw new ConflictException("Cannot reject the event because it's not in the right state: " + event.getState());
+            }
+        }
+        event = eventRepository.save(event);
+        var responseDto = modelMapper.map(event, FullEventResponseDto.class);
+        if (event.getState() == State.CANCELED) responseDto.setParticipantLimit(0);
+        return responseDto;
+    }
+
+    @Override
+    public List<EventShortDto> getEventsByParam(String text, Set<Long> categories, Boolean paid, LocalDateTime rangeStart,
+                                                LocalDateTime rangeEnd, boolean onlyAvailable, SortEvent sort,
+                                                int from, int size, HttpServletRequest request) {
+        PageRequest pageRequest = getPageRequest(from, size);
+        if (sort == SortEvent.EVENT_DATE) pageRequest.withSort(Sort.by("eventDate"));
+
+        Page<Event> eventsByParam;
+        if (onlyAvailable) {
+            eventsByParam = eventRepository.getAvailableEventsByParam(text, categories, paid, rangeStart, rangeEnd, pageRequest);
+        } else {
+            eventsByParam = eventRepository.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, pageRequest);
+        }
+        utilService.addHit(request);
+        return eventsByParam.get().map(event -> modelMapper.map(event, EventShortDto.class)).collect(Collectors.toList());
+    }
+
+
+    @Override
+    public FullEventResponseDto getEventPublic(long eventId, HttpServletRequest request) {
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event dont found"));
+        if (event.getState() != State.PUBLISHED) throw new NotFoundException("Event dont found");
+        FullEventResponseDto dto = modelMapper.map(event, FullEventResponseDto.class);
+        Map<Long, Long> views = utilService.findViews(List.of(event));
+        log.info(views.toString());
+        utilService.addHit(request);
+        dto.setViews(!views.containsKey(eventId) ? 0 : views.get(eventId));
+        return dto;
+    }
+
+    @Override
+    public FullEventResponseDto createEvent(EventCreateDto eventDto, Long userId) {
+        User initiator = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User dont found"));
+
+        Category category = categoryRepository.findById(eventDto.getCategory())
+                .orElseThrow(() -> new NotFoundException("Category dont found"));
+
+        Event event = EventMapper.createDtoToEvent(eventDto, initiator, category);
+        event = eventRepository.save(event);
+        return EventMapper.toFullEventResponseDto(event, 0, 0);
+    }
+
+    @Override
+    public List<EventShortDto> getEventsForUser(long userId, int from, int size) {
+        PageRequest pageRequest = getPageRequest(from, size);
+        User initiator = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User dont found"));
+        return eventRepository.findAll(pageRequest).stream().map((x) ->
+                EventMapper.toGetEventDto(x, initiator, 0, 0)).collect(Collectors.toList());
+    }
+
+    @Override
+    public FullEventResponseDto getEventForUser(Long userId, Long eventId) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User dont found"));
+
+        Event event = eventRepository.findByInitiatorIdAndId(userId, eventId)
+                .orElseThrow(() -> new NotFoundException("Not found event"));
+        var responseDto = EventMapper.toFullEventResponseDto(event, 0, 0);
+        if (event.getState() == State.CANCELED) responseDto.setParticipantLimit(0);
+        return responseDto;
+    }
+
+    @Override
+    public FullEventResponseDto updateEventForUser(Long userId, Long eventId, EventPatchUserDto eventDto) {
+        if (eventDto.getParticipantLimit() != null)
+            if (eventDto.getParticipantLimit() == 0)
+                eventDto.setParticipantLimit(null);
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User dont found"));
+        Event event = eventRepository.findByInitiatorIdAndId(userId, eventId)
+                .orElseThrow(() -> new NotFoundException("Not found event"));
+        if (event.getState() == State.PUBLISHED)
+            throw new ConflictException("Only pending or canceled events can be changed");
+        modelMapper.map(eventDto, event);
+        event = eventRepository.save(event);
+        if (eventDto.getStateAction() != null)
+            switch (eventDto.getStateAction()) {
+                case CANCEL_REVIEW:
+                    event.setState(State.CANCELED);
+                    break;
+                case SEND_TO_REVIEW:
+                    event.setState(State.PENDING);
+                    break;
+            }
+        return EventMapper.toFullEventResponseDto(event, 0, 0);
+    }
+
+    @Override
+    public List<FullRequestsDto> getRequestForEvent(Long userId, Long eventId) {
+        return eventRequestRepository.findAllByEvent_InitiatorIdAndEventId(userId, eventId);
+    }
+
+    @Override
+    public StatusListRequestDto changeStatusRequests(Long userId, Long eventId, EventRequestsPatchDto dto) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User dont found"));
+        Event event = eventRepository.findByInitiatorIdAndId(userId, eventId)
+                .orElseThrow(() -> new NotFoundException("Event dont found"));
+
+        if (!event.getRequestModeration())
+            return new StatusListRequestDto(eventRequestRepository.findConfirmDtoByIdIn(eventId, dto.getRequestIds()),
+                    eventRequestRepository.findRejectedDtoByIdIn(eventId, dto.getRequestIds()));
+
+        int countConfirmed = eventRequestRepository.countByStatusConfirmed(eventId);
+
+        List<EventRequest> eventRequests = eventRequestRepository.findByIdIn(eventId, dto.getRequestIds());
+
+        if (countConfirmed >= event.getParticipantLimit())
+            throw new ConflictException("The participant limit has been reached");
+
+        for (var eventRequest : eventRequests) {
+            if (eventRequest.getStatus() != Status.PENDING)
+                throw new ConflictException("Status can be changed only for requests that are in the pending state");
+            if (countConfirmed < event.getParticipantLimit() || event.getParticipantLimit() == 0) {
+                eventRequest.setStatus(dto.getStatus());
+                if (dto.getStatus() == Status.CONFIRMED)
+                    countConfirmed++;
+            } else eventRequest.setStatus(Status.REJECTED);
+            eventRequestRepository.save(eventRequest);
+            log.info("Request {} status changed to {}", eventRequest.getId(), eventRequest.getStatus());
+        }
+        return new StatusListRequestDto(eventRequestRepository.findConfirmDtoByIdIn(eventId, dto.getRequestIds()),
+                eventRequestRepository.findRejectedDtoByIdIn(eventId, dto.getRequestIds()));
+    }
+
+}
