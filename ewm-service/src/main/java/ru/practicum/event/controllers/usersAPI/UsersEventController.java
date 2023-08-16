@@ -80,11 +80,6 @@ public class UsersEventController {
                                                      @PathVariable @Positive Long eventId,
                                                      @RequestBody @Valid EventRequestsPatchDto dto, HttpServletRequest request) {
         log.info("Patch Request {} with dto: {}.", request.getRequestURI(), dto);
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         return usersEventService.changeStatusRequests(userId, eventId, dto);
     }
 
