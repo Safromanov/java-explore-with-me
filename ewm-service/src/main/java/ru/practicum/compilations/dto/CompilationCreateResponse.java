@@ -13,6 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 public class CompilationCreateResponse {
+
     private Long id;
     private List<EventShortDto> events;
     private boolean pinned;

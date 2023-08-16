@@ -21,9 +21,9 @@ class AdminCategoryServiceTest {
 
     @Test
     void postCategory_returnConflict() {
-        adminCategoryService.postCategory(new RequestCategoryDto("Category"));
+        adminCategoryService.createCategory(new RequestCategoryDto("Category"));
         assertThrows(ConflictException.class, () ->
-                adminCategoryService.postCategory(new RequestCategoryDto("Category")));
+                adminCategoryService.createCategory(new RequestCategoryDto("Category")));
     }
 
     @Test

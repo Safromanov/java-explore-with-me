@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Setter
 @Getter
-@JsonView(View.Post.class)
+@JsonView(View.Create.class)
 @ToString
 public class EventCreateDto {
     @NotBlank
@@ -46,6 +46,6 @@ public class EventCreateDto {
     @NotBlank
     @Size(min = 3, max = 120)
     private String title;
-    @JsonView(View.Patch.class)
+    @JsonView(View.Update.class)
     private StateUserAction stateAction;
 }

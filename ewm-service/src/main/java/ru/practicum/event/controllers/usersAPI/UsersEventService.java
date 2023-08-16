@@ -16,7 +16,6 @@ import ru.practicum.event.dto.FullEventResponseDto;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.EventMapper;
 import ru.practicum.event.model.State;
-import ru.practicum.event.util.UtilService;
 import ru.practicum.exceptionHandler.ConflictException;
 import ru.practicum.exceptionHandler.NotFoundException;
 import ru.practicum.requests.EventRequestRepository;
@@ -25,8 +24,8 @@ import ru.practicum.requests.dto.FullRequestsDto;
 import ru.practicum.requests.dto.StatusListRequestDto;
 import ru.practicum.requests.model.EventRequest;
 import ru.practicum.requests.model.Status;
+import ru.practicum.user.UserRepository;
 import ru.practicum.user.model.User;
-import ru.practicum.user.model.UserRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,11 +44,9 @@ public class UsersEventService {
 
     private final EventRequestRepository eventRequestRepository;
 
-    private final UtilService utilService;
-
     private final ModelMapper modelMapper;
 
-    public FullEventResponseDto postEvent(EventCreateDto eventDto, Long userId) {
+    public FullEventResponseDto createEvent(EventCreateDto eventDto, Long userId) {
         User initiator = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User dont found"));
 
         Category category = categoryRepository.findById(eventDto.getCategory())
@@ -78,7 +75,7 @@ public class UsersEventService {
     }
 
 
-    public FullEventResponseDto patchEvent(Long userId, Long eventId, EventPatchUserDto eventDto) {
+    public FullEventResponseDto updateEvent(Long userId, Long eventId, EventPatchUserDto eventDto) {
         if (eventDto.getParticipantLimit() != null)
             if (eventDto.getParticipantLimit() == 0)
                 eventDto.setParticipantLimit(null);
@@ -102,11 +99,11 @@ public class UsersEventService {
         return responseDto;
     }
 
-    public List<FullRequestsDto> getRequests(Long userId, Long eventId) {
+    public List<FullRequestsDto> getRequestForEvent(Long userId, Long eventId) {
         return eventRequestRepository.findAllByEvent_InitiatorIdAndEventId(userId, eventId);
     }
 
-    public StatusListRequestDto patchRequests(Long userId, Long eventId, EventRequestsPatchDto dto) {
+    public StatusListRequestDto changeStatusRequests(Long userId, Long eventId, EventRequestsPatchDto dto) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User dont found"));
         Event event = eventRepository.findByInitiatorIdAndId(userId, eventId)
                 .orElseThrow(() -> new NotFoundException("Event dont found"));

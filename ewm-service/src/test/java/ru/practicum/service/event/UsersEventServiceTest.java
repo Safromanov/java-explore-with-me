@@ -23,6 +23,6 @@ public class UsersEventServiceTest {
     @Test
     void patchRequests() throws JsonProcessingException {
         EventRequestsPatchDto patchDto = new EventRequestsPatchDto(Collections.singleton(2L), Status.CONFIRMED);
-        System.out.println(objectMapper.writeValueAsString(eventService.patchRequests(1L, 1L, patchDto)));
+        System.out.println(objectMapper.writeValueAsString(eventService.changeStatusRequests(1L, 1L, patchDto)));
     }
 }

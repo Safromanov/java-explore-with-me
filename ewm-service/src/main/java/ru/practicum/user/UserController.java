@@ -11,6 +11,7 @@ import ru.practicum.user.model.dto.UserDto;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.Set;
 
@@ -25,23 +26,23 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDto> getUsers(@RequestParam(required = false) Set<Long> ids,
-                                  @RequestParam(defaultValue = "0") int from,
-                                  @RequestParam(defaultValue = "10") @Min(1) @Max(100000) int size) {
+    public List<UserDto> getUsersByParam(@RequestParam(required = false) Set<Long> ids,
+                                         @RequestParam(defaultValue = "0") int from,
+                                         @RequestParam(defaultValue = "10") @Min(1) @Max(100000) int size) {
         log.debug("GET /admin/users");
-        return userService.getUsers(ids, from, size);
+        return userService.getUsersByParam(ids, from, size);
     }
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto postUser(@RequestBody @Valid CreateUserDto userDto) {
+    public UserDto createUser(@RequestBody @Valid CreateUserDto userDto) {
         log.info("POST /admin/users with dto: {}.", userDto);
-        return userService.postUser(userDto);
+        return userService.createUser(userDto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable long id) {
+    public void deleteUser(@PathVariable @Positive long id) {
         log.debug("DELETE /admin/users with id: {}.", id);
         userService.deleteUser(id);
     }

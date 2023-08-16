@@ -32,7 +32,8 @@ public class StatisticsClient {
 
     public List<GetStatDto> getStaticsForUri(ClientStatDto clientStatDto) throws JsonProcessingException {
         Object body = get(clientStatDto.toMap()).getBody();
-        return objectMapper.convertValue(body, new TypeReference<>() {});
+        return objectMapper.convertValue(body, new TypeReference<>() {
+        });
     }
 
     public ResponseEntity<Object> addHit(String appName, String requestURI, HttpServletRequest request) {

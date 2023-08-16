@@ -32,7 +32,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                                           LocalDateTime end,
                                           List<String> uris,
                                           boolean unique) {
-        for (var a: uris)
+        for (var a : uris)
             log.info("URI" + a);
         if (uris == null || uris.isEmpty()) {
             if (unique)

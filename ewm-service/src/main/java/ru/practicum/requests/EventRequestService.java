@@ -13,8 +13,8 @@ import ru.practicum.exceptionHandler.NotFoundException;
 import ru.practicum.requests.dto.EventRequestDto;
 import ru.practicum.requests.model.EventRequest;
 import ru.practicum.requests.model.Status;
+import ru.practicum.user.UserRepository;
 import ru.practicum.user.model.User;
-import ru.practicum.user.model.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,7 +32,10 @@ public class EventRequestService {
     private final ModelMapper modelMapper;
 
 
-    public EventRequestDto postNewEventRequest(long userId, long eventId) {
+    public EventRequestDto createEventRequest(long userId, long eventId) {
+        eventRequestRepository.findByRequesterIdAndEventId(userId, eventId).ifPresent((x) -> {
+            throw new ConflictException("Request already exist");
+        });
         User requester = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User dont found"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event dont found"));
         if (event.getState() != State.PUBLISHED)
@@ -42,11 +45,6 @@ public class EventRequestService {
             throw new ConflictException("Event is full");
         if (requester.getId().equals(event.getInitiator().getId()))
             throw new ConflictException("You can't request to your event");
-        eventRequestRepository.findByRequesterIdAndEventId(userId, eventId).ifPresent((x) -> {
-            throw new ConflictException("Request already exist");
-        });
-
-
         EventRequest eventRequest = new EventRequest();
         eventRequest.setCreated(LocalDateTime.now());
         eventRequest.setRequester(requester);
@@ -70,7 +68,6 @@ public class EventRequestService {
 
     public EventRequestDto cancelEventRequests(long requesterId, long eventRequestId) {
         userRepository.findById(requesterId).orElseThrow(() -> new NotFoundException("User dont found"));
-
         EventRequest eventRequest = eventRequestRepository
                 .findByRequesterIdAndId(requesterId, eventRequestId)
                 .orElseThrow(() -> new NotFoundException("User dont found"));

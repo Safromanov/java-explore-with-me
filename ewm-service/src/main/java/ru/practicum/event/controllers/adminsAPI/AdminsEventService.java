@@ -64,7 +64,7 @@ public class AdminsEventService {
         return PageRequest.of(from > 0 ? from / size : 0, size);
     }
 
-    public FullEventResponseDto patchEvent(long eventId, UpdateEventAdminRequest dto) {
+    public FullEventResponseDto updateEvent(long eventId, UpdateEventAdminRequest dto) {
         if (dto.getParticipantLimit() != null)
             if (dto.getParticipantLimit() == 0) dto.setParticipantLimit(null);
 

@@ -12,6 +12,5 @@ import lombok.Setter;
 public class ResponseCategoryDto {
 
     private Long id;
-
     private String name;
 }

@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -35,7 +34,6 @@ public class StatController {
     @ResponseStatus(HttpStatus.OK)
     public List<GetStatDto> getStatistics(@RequestParam(defaultValue = "1972-05-05 00:00:00") LocalDateTime start, @RequestParam(defaultValue = "3020-05-05 00:00:00") LocalDateTime end, @RequestParam(required = false) List<String> uris, @RequestParam(defaultValue = "false") boolean unique, HttpServletRequest request) {
         log.info("Query " + request.getQueryString());
-        log.info("GET /stats with params: {}, {}, {}, {}", start, end, uris.stream().map(s -> "'" + s + "'").collect(Collectors.joining(",")), unique);
 
         if (start != null && end != null) if (start.isAfter(end)) {
             throw new IllegalArgumentException("Start must be before end");

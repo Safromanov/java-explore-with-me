@@ -9,33 +9,34 @@ import ru.practicum.category.dto.RequestCategoryDto;
 import ru.practicum.category.dto.ResponseCategoryDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 
 @Slf4j
 @RestController
 @RequestMapping("/admin/categories")
 @RequiredArgsConstructor
-public class AdminCategoryCategoryController {
+public class AdminCategoryController {
 
     private final AdminCategoryService adminCategoryService;
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseCategoryDto postCategory(@RequestBody @Valid RequestCategoryDto requestCategoryDto) {
+    public ResponseCategoryDto createCategory(@RequestBody @Valid RequestCategoryDto requestCategoryDto) {
         log.debug("POST /admin/categories with dto: {}.", requestCategoryDto);
-        return adminCategoryService.postCategory(requestCategoryDto);
+        return adminCategoryService.createCategory(requestCategoryDto);
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseCategoryDto patchCategory(@RequestBody @Valid RequestCategoryDto requestCategoryDto,
-                                             @PathVariable Long id) {
+    public ResponseCategoryDto updateCategory(@RequestBody @Valid RequestCategoryDto requestCategoryDto,
+                                              @PathVariable Long id) {
         log.debug("PATCH /admin/categories with: {}, {}.", id, requestCategoryDto);
         return adminCategoryService.patchCategory(requestCategoryDto, id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCategory(@PathVariable long id) {
+    public void deleteCategory(@PathVariable @Positive long id) {
         log.debug("DELETE /admin/categories with id: {}.", id);
         adminCategoryService.deleteCategory(id);
     }

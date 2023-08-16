@@ -5,7 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.compilations.dto.CompilationCreateResponse;
-import ru.practicum.compilations.dto.CompilationDTOPostAdmin;
+import ru.practicum.compilations.dto.CompilationDtoReq;
 import ru.practicum.compilations.model.Compilation;
 import ru.practicum.compilations.model.CompilationMapper;
 import ru.practicum.compilations.model.CompilationRepository;
@@ -24,14 +24,14 @@ public class AdminCompilationsService {
     private final EventRepository eventRepository;
     private final ModelMapper modelMapper;
 
-    public CompilationCreateResponse createCompilation(CompilationDTOPostAdmin compilationDDto, HttpServletRequest request) {
+    public CompilationCreateResponse createCompilation(CompilationDtoReq compilationDDto, HttpServletRequest request) {
         List<Event> event = eventRepository.findByIdIn(compilationDDto.getEventIds());
         var compilation = CompilationMapper.createDTOToEntity(compilationDDto, event);
         compilation = compilationRepository.save(compilation);
         return modelMapper.map(compilation, CompilationCreateResponse.class);
     }
 
-    public CompilationCreateResponse updateCompilation(CompilationDTOPostAdmin compilationDDto, Long compId) {
+    public CompilationCreateResponse updateCompilation(CompilationDtoReq compilationDDto, Long compId) {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Compilation with id=" + compId + " was not found"));
         if (compilationDDto.getEventIds() != null) {

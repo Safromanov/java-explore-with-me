@@ -22,7 +22,7 @@ public class PublicCompilationsService {
     private final ModelMapper modelMapper;
 
 
-    public List<CompilationCreateResponse> getCompilations(Boolean pinned, int from, int size) {
+    public List<CompilationCreateResponse> getCompilationsByParam(Boolean pinned, int from, int size) {
         List<Compilation> compilationList = compilationRepository.findByParams(pinned, getPageRequest(from, size));
         log.info("Result: {}", compilationList.size());
 

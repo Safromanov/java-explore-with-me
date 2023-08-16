@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class UsersEventControllerTest {
+class UsersPublicEventControllerTest {
 
 
     private final EasyRandom easyRandom = new EasyRandom();
@@ -56,7 +56,7 @@ class UsersEventControllerTest {
         eventDto.setCategory(category.getId());
         var requestBuilder = MockMvcRequestBuilders.post("/users/1/events")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writerWithView(View.Post.class).writeValueAsString(eventDto));
+                .content(objectMapper.writerWithView(View.Create.class).writeValueAsString(eventDto));
         var mvcResult = this.mockMvc.perform(requestBuilder)
                 .andExpectAll(
                         status().isCreated(),

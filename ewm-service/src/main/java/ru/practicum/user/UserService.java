@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import ru.practicum.exceptionHandler.ConflictException;
 import ru.practicum.exceptionHandler.NotFoundException;
 import ru.practicum.user.model.User;
-import ru.practicum.user.model.UserRepository;
 import ru.practicum.user.model.dto.CreateUserDto;
 import ru.practicum.user.model.dto.UserDto;
 
@@ -23,14 +22,14 @@ public class UserService {
 
     private final ModelMapper modelMapper;
 
-    public List<UserDto> getUsers(Set<Long> ids, int from, int size) {
+    public List<UserDto> getUsersByParam(Set<Long> ids, int from, int size) {
         PageRequest pageRequest = getPageRequest(from, size);
         return userRepository.findByIdIn(ids, pageRequest).get()
                 .map(x -> modelMapper.map(x, UserDto.class))
                 .collect(Collectors.toList());
     }
 
-    public UserDto postUser(CreateUserDto createUserDto) {
+    public UserDto createUser(CreateUserDto createUserDto) {
         User user;
         try {
             user = userRepository.save(modelMapper.map(createUserDto, User.class));

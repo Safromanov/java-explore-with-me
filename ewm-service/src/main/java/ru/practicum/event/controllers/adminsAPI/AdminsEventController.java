@@ -11,8 +11,8 @@ import ru.practicum.exceptionHandler.BadRequestException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -34,8 +34,8 @@ public class AdminsEventController {
                                                        @RequestParam(required = false) LocalDateTime rangeEnd,
                                                        @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                                        @RequestParam(required = false) SortEvent sort,
-                                                       @RequestParam(defaultValue = "0") int from,
-                                                       @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size, HttpServletRequest request) {
+                                                       @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                                       @RequestParam(defaultValue = "10") @Positive int size, HttpServletRequest request) {
         log.info("GET /admin/events with params: {}.",
                 request.getQueryString());
         var res = eventService.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
@@ -45,12 +45,12 @@ public class AdminsEventController {
 
     @PatchMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
-    public FullEventResponseDto patchEvent(@PathVariable long eventId, @RequestBody @Valid UpdateEventAdminRequest dto) {
+    public FullEventResponseDto updateEvent(@PathVariable @Positive long eventId, @RequestBody @Valid UpdateEventAdminRequest dto) {
         log.info("PATCH /admin/events/{} with dto: {}.", eventId, dto);
         if (dto.getEventDate() != null) {
             if (dto.getEventDate().isBefore(LocalDateTime.now()))
                 throw new BadRequestException("Field: eventDate. The event must start no later than current time.");
         }
-        return eventService.patchEvent(eventId, dto);
+        return eventService.updateEvent(eventId, dto);
     }
 }

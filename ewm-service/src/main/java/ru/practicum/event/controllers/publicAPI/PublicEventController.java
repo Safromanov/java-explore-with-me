@@ -10,7 +10,8 @@ import ru.practicum.event.model.SortEvent;
 import ru.practicum.exceptionHandler.BadRequestException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -19,7 +20,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/events")
 @RequiredArgsConstructor
-public class EventController {
+public class PublicEventController {
 
     private final EventService eventService;
 
@@ -32,8 +33,8 @@ public class EventController {
                                                 @RequestParam(required = false) LocalDateTime rangeEnd,
                                                 @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                                 @RequestParam(required = false) SortEvent sort,
-                                                @RequestParam(defaultValue = "0") int from,
-                                                @RequestParam(defaultValue = "10") @Min(1) int size,
+                                                @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                                @RequestParam(defaultValue = "10") @Positive int size,
                                                 HttpServletRequest request) {
         log.info("GET /events with params: {}, .",
                 request.getQueryString());
@@ -45,9 +46,8 @@ public class EventController {
 
     @GetMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
-    public FullEventResponseDto getEvent(@PathVariable long eventId, HttpServletRequest request) {
+    public FullEventResponseDto getEvent(@PathVariable @Positive long eventId, HttpServletRequest request) {
         log.info("GET  Event - {}.", request.getRequestURI());
         return eventService.getEvent(eventId, request);
     }
-
 }

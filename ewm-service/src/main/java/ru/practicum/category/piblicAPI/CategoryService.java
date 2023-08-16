@@ -19,14 +19,11 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
 
-    public List<ResponseCategoryDto> getCategories(int from, int size) {
-        return categoryRepository.findAll(getPageRequest(from, size)).stream()
+    public List<ResponseCategoryDto> getCategoriesByParam(int from, int size) {
+        PageRequest pageRequest = PageRequest.of(from > 0 ? from / size : 0, size);
+        return categoryRepository.findAll(pageRequest).stream()
                 .map(category -> modelMapper.map(category, ResponseCategoryDto.class))
                 .collect(Collectors.toList());
-    }
-
-    private PageRequest getPageRequest(int from, int size) {
-        return PageRequest.of(from > 0 ? from / size : 0, size);
     }
 
     public ResponseCategoryDto getCategory(long catId) {

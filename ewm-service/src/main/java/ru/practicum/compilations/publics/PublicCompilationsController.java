@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.compilations.dto.CompilationCreateResponse;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -19,22 +20,19 @@ public class PublicCompilationsController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<CompilationCreateResponse> getCompilations(@RequestParam(required = false) Boolean pinned,
-                                                           @RequestParam(defaultValue = "0") int from,
-                                                           @RequestParam(defaultValue = "10") @Min(1) int size,
-                                                           HttpServletRequest request) {
+    public List<CompilationCreateResponse> getCompilationsByParam(@RequestParam(required = false) Boolean pinned,
+                                                                  @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                                                  @RequestParam(defaultValue = "10") @Positive int size,
+                                                                  HttpServletRequest request) {
         log.info("GET Compilations with params: {}, {}, {}.",
                 request.getQueryString(), from, size);
 
-        var result = compilationsService.getCompilations(pinned, from, size);
-        log.info("Result: {}", result);
-        return result;
+        return compilationsService.getCompilationsByParam(pinned, from, size);
     }
 
     @GetMapping("{compIp}")
     @ResponseStatus(HttpStatus.OK)
-    public CompilationCreateResponse getCompilation(@PathVariable long compIp,
-                                                    HttpServletRequest request) {
+    public CompilationCreateResponse getCompilation(@PathVariable @Positive long compIp) {
         log.info("GET Compilation : {}", compIp);
         return compilationsService.getCompilation(compIp);
     }

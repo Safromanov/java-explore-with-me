@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class AdminAdminCategoryCategoryControllerTest {
+public class AdminAdminPublicCategoryControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

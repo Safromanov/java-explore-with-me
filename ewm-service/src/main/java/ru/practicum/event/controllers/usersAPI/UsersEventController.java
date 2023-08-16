@@ -17,6 +17,7 @@ import ru.practicum.requests.dto.StatusListRequestDto;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,11 +31,11 @@ public class UsersEventController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public FullEventResponseDto postEvent(@RequestBody @Valid EventCreateDto eventDto, @PathVariable Long userId, HttpServletRequest request) {
+    public FullEventResponseDto createEvent(@RequestBody @Valid EventCreateDto eventDto, @PathVariable Long userId, HttpServletRequest request) {
         log.info("POST {} with dto: {}.", request.getRequestURI(), eventDto);
         if (eventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2)))
             throw new BadRequestException("Field: eventDate. The event must start no later than 2 hours from the current time.");
-        return usersEventService.postEvent(eventDto, userId);
+        return usersEventService.createEvent(eventDto, userId);
     }
 
     @GetMapping
@@ -55,36 +56,36 @@ public class UsersEventController {
 
     @PatchMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
-    public FullEventResponseDto patchEvent(@PathVariable Long userId,
-                                           @PathVariable Long eventId,
-                                           @RequestBody @Valid EventPatchUserDto eventDto) {
+    public FullEventResponseDto updateEvent(@PathVariable @Positive Long userId,
+                                            @PathVariable @Positive Long eventId,
+                                            @RequestBody @Valid EventPatchUserDto eventDto) {
         log.info("GET /users/{}/events.", userId);
         if (eventDto.getEventDate() != null)
             if (eventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2)))
                 throw new BadRequestException("Field: eventDate. The event must start no later than 2 hours from the current time.");
-        return usersEventService.patchEvent(userId, eventId, eventDto);
+        return usersEventService.updateEvent(userId, eventId, eventDto);
     }
 
     @GetMapping("/{eventId}/requests")
     @ResponseStatus(HttpStatus.OK)
-    public List<FullRequestsDto> getRequests(@PathVariable Long userId,
-                                             @PathVariable Long eventId) {
+    public List<FullRequestsDto> getRequestForEvent(@PathVariable @Positive Long userId,
+                                                    @PathVariable @Positive Long eventId) {
         log.info("GET /users/{}/events.", userId);
-        return usersEventService.getRequests(userId, eventId);
+        return usersEventService.getRequestForEvent(userId, eventId);
     }
 
     @PatchMapping("/{eventId}/requests")
     @ResponseStatus(HttpStatus.OK)
-    public StatusListRequestDto patchRequests(@PathVariable Long userId,
-                                              @PathVariable Long eventId,
-                                              @RequestBody @Valid EventRequestsPatchDto dto, HttpServletRequest request) {
+    public StatusListRequestDto changeStatusRequests(@PathVariable @Positive Long userId,
+                                                     @PathVariable @Positive Long eventId,
+                                                     @RequestBody @Valid EventRequestsPatchDto dto, HttpServletRequest request) {
         log.info("Patch Request {} with dto: {}.", request.getRequestURI(), dto);
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        return usersEventService.patchRequests(userId, eventId, dto);
+        return usersEventService.changeStatusRequests(userId, eventId, dto);
     }
 
 }

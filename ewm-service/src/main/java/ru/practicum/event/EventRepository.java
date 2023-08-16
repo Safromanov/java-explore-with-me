@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.lang.Nullable;
+import ru.practicum.category.Category;
 import ru.practicum.event.model.Event;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
+    @Query("select (count(e) > 0) from Event e where e.category = ?1")
+    boolean existsByCategory(Category category);
 
 
     Optional<Event> findByInitiatorIdAndId(Long id, Long id1);

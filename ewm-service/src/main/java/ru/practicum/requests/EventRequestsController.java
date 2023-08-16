@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.requests.dto.EventRequestDto;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @Slf4j
@@ -22,22 +22,22 @@ public class EventRequestsController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventRequestDto postEventRequest(@PathVariable long userId,
-                                            @RequestParam long eventId, HttpServletRequest request) {
+    public EventRequestDto createEventRequest(@PathVariable @Positive long userId,
+                                              @RequestParam @Positive long eventId, HttpServletRequest request) {
         log.info("POST Event Request  {} with eventId: {}.", request.getRequestURI(), eventId);
-        return eventRequestService.postNewEventRequest(userId, eventId);
+        return eventRequestService.createEventRequest(userId, eventId);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<EventRequestDto> getEventRequests(@PathVariable @Min(1) long userId) {
+    public List<EventRequestDto> getEventRequests(@PathVariable @Positive long userId) {
         log.info("GET /users/{}/requests.", userId);
         return eventRequestService.getEventRequests(userId);
     }
 
     @PatchMapping("/{eventRequestId}/cancel")
     @ResponseStatus(HttpStatus.OK)
-    public EventRequestDto cancelEventRequests(@PathVariable @Min(1) long userId, @PathVariable @Min(1) long eventRequestId) {
+    public EventRequestDto cancelEventRequests(@PathVariable @Positive long userId, @PathVariable @Positive long eventRequestId) {
         log.info("PATCH /users/{}/requests/{}/cancel.", userId, eventRequestId);
         return eventRequestService.cancelEventRequests(userId, eventRequestId);
     }

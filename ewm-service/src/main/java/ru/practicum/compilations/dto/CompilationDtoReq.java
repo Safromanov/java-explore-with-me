@@ -14,7 +14,8 @@ import java.util.Set;
 @Setter
 @Getter
 @ToString
-public class CompilationDTOPostAdmin {
+public class CompilationDtoReq {
+
     @JsonProperty("events")
     public Set<Long> eventIds;
 
