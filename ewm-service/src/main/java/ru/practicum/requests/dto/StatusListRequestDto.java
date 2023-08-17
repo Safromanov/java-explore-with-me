@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StatusListRequestDto {
+
     public List<FullRequestsDto> confirmedRequests;
 
     public List<FullRequestsDto> rejectedRequests;

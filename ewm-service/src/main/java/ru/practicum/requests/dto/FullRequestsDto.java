@@ -8,6 +8,7 @@ import ru.practicum.requests.model.Status;
 import java.time.LocalDateTime;
 
 public interface FullRequestsDto {
+
     long getId();
 
     @JsonProperty("event")

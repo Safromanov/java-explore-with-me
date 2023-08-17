@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface EventService {
+
     List<FullEventResponseDto> getEventsByParamForAdmin(String text, Set<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, SortEvent sort, int from, int size);
 
     FullEventResponseDto updateEvent(long eventId, UpdateEventAdminRequest dto);

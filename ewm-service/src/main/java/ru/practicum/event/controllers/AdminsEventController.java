@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.event.dto.FullEventResponseDto;
 import ru.practicum.event.dto.UpdateEventAdminRequest;
 import ru.practicum.event.model.SortEvent;
-import ru.practicum.event.service.EventServiceImpl;
+import ru.practicum.event.service.EventService;
 import ru.practicum.exceptionHandler.BadRequestException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AdminsEventController {
 
-    private final EventServiceImpl eventService;
+    private final EventService eventService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -54,6 +54,4 @@ public class AdminsEventController {
         }
         return eventService.updateEvent(eventId, dto);
     }
-
-
 }

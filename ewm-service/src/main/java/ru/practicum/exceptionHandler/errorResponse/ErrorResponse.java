@@ -31,10 +31,7 @@ public class ErrorResponse {
                 reason = "Unknown status";
         }
 
-
         this.message = message;
         this.timestamp = LocalDateTime.now();
     }
-
-
 }

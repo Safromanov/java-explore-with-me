@@ -75,5 +75,4 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new NotFoundException("Category not found"));
         return modelMapper.map(category, ResponseCategoryDto.class);
     }
-
 }

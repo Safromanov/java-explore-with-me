@@ -1,4 +1,4 @@
-package ru.practicum;
+package ru.practicum.config;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
@@ -21,9 +21,7 @@ public class ModelMapperConfiguration {
                 map().setRequester(source.getRequester().getId());
             }
         });
-
         return mapper;
     }
-
 }
 

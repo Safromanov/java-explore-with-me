@@ -9,6 +9,7 @@ import java.util.Set;
 @Value
 @ToString
 public class EventRequestsPatchDto {
+
     Set<Long> requestIds;
 
     Status status;

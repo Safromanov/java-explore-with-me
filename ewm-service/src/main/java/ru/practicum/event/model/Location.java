@@ -15,6 +15,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "locations")
 public class Location {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -23,5 +24,4 @@ public class Location {
 
     private float lat;
     private float lon;
-
 }

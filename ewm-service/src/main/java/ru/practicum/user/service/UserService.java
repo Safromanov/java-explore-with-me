@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface UserService {
+
     List<UserDto> getUsersByParam(Set<Long> ids, int from, int size);
 
     UserDto createUser(CreateUserDto createUserDto);

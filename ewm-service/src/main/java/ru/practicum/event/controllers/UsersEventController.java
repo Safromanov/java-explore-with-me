@@ -9,7 +9,7 @@ import ru.practicum.event.dto.EventCreateDto;
 import ru.practicum.event.dto.EventPatchUserDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.FullEventResponseDto;
-import ru.practicum.event.service.EventServiceImpl;
+import ru.practicum.event.service.EventService;
 import ru.practicum.exceptionHandler.BadRequestException;
 import ru.practicum.requests.dto.EventRequestsPatchDto;
 import ru.practicum.requests.dto.FullRequestsDto;
@@ -28,7 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class UsersEventController {
-    private final EventServiceImpl eventService;
+    private final EventService eventService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -83,5 +83,4 @@ public class UsersEventController {
         log.info("Patch Request {} with dto: {}.", request.getRequestURI(), dto);
         return eventService.changeStatusRequests(userId, eventId, dto);
     }
-
 }

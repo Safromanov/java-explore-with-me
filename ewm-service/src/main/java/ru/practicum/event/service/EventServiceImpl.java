@@ -1,5 +1,6 @@
 package ru.practicum.event.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -8,15 +9,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.StatisticsClient;
 import ru.practicum.category.CategoryRepository;
 import ru.practicum.category.model.Category;
+import ru.practicum.dto.ClientStatDto;
+import ru.practicum.dto.GetStatDto;
 import ru.practicum.event.EventRepository;
 import ru.practicum.event.dto.*;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.EventMapper;
 import ru.practicum.event.model.SortEvent;
 import ru.practicum.event.model.State;
-import ru.practicum.event.util.UtilService;
 import ru.practicum.exceptionHandler.ConflictException;
 import ru.practicum.exceptionHandler.NotFoundException;
 import ru.practicum.requests.EventRequestRepository;
@@ -30,10 +33,7 @@ import ru.practicum.user.model.User;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,10 +44,11 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
     private final ModelMapper modelMapper;
-    private final UtilService utilService;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final EventRequestRepository eventRequestRepository;
+    private final StatisticsClient statisticsClient;
+
 
     @Override
     public List<FullEventResponseDto> getEventsByParamForAdmin(String text, Set<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, SortEvent sort, int from, int size) {
@@ -60,8 +61,8 @@ public class EventServiceImpl implements EventService {
             eventsByParamPage = eventRepository.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, pageRequest);
         }
         List<Event> eventsByParam = eventsByParamPage.get().collect(Collectors.toList());
-        var statViews = utilService.findViews(eventsByParam);
-        var views = utilService.findViews(eventsByParam);
+        var statViews = findViews(eventsByParam);
+        var views = findViews(eventsByParam);
         var listDtoResponse = eventsByParam.stream().map(event -> {
             var responseDto = modelMapper.map(event, FullEventResponseDto.class);
             responseDto.setConfirmedRequests(eventRequestRepository.countByStatusConfirmed(event.getId()));
@@ -118,7 +119,7 @@ public class EventServiceImpl implements EventService {
         } else {
             eventsByParam = eventRepository.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, pageRequest);
         }
-        utilService.addHit(request);
+        addHit(request);
         return eventsByParam.get().map(event -> modelMapper.map(event, EventShortDto.class)).collect(Collectors.toList());
     }
 
@@ -127,8 +128,8 @@ public class EventServiceImpl implements EventService {
     public FullEventResponseDto getEventPublic(long eventId, HttpServletRequest request) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event dont found"));
         if (event.getState() != State.PUBLISHED) throw new NotFoundException("Event dont found");
-        utilService.addHit(request);
-        Map<Long, Long> views = utilService.findViews(List.of(event));
+        addHit(request);
+        Map<Long, Long> views = findViews(List.of(event));
         FullEventResponseDto dto = modelMapper.map(event, FullEventResponseDto.class);
         dto.setViews(!views.containsKey(eventId) ? 0 : views.get(eventId));
         return dto;
@@ -224,5 +225,30 @@ public class EventServiceImpl implements EventService {
         }
         return new StatusListRequestDto(eventRequestRepository.findConfirmDtoByIdIn(eventId, dto.getRequestIds()),
                 eventRequestRepository.findRejectedDtoByIdIn(eventId, dto.getRequestIds()));
+    }
+
+    private void addHit(HttpServletRequest request) {
+        statisticsClient.addHit("ewm-main-service", request.getRequestURI(), request);
+    }
+
+    public Map<Long, Long> findViews(List<Event> events) {
+
+        ClientStatDto clientStatDto = ClientStatDto.builder().unique(true).uris(events.stream().map(Event::getUri).collect(Collectors.toList())).build();
+        log.info("clientStatDto -" + clientStatDto);
+        List<GetStatDto> dtoStatList;
+        try {
+            dtoStatList = statisticsClient.getStaticsForUri(clientStatDto);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        Map<Long, Long> map = new HashMap<>();
+        for (var dto : dtoStatList) {
+            String[] parts = dto.getUri().split("/");
+            Long eventId = parts.length < 2 ? 0 : Long.parseLong(parts[2]);
+            map.put(eventId, dto.getHits());
+            log.info("Full uri -" + dto.getUri() + " key - " + eventId + " val - " + dto.getHits());
+        }
+        return map;
     }
 }

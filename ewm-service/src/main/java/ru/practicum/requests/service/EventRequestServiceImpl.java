@@ -1,4 +1,4 @@
-package ru.practicum.requests;
+package ru.practicum.requests.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +10,7 @@ import ru.practicum.event.model.Event;
 import ru.practicum.event.model.State;
 import ru.practicum.exceptionHandler.ConflictException;
 import ru.practicum.exceptionHandler.NotFoundException;
+import ru.practicum.requests.EventRequestRepository;
 import ru.practicum.requests.dto.EventRequestDto;
 import ru.practicum.requests.model.EventRequest;
 import ru.practicum.requests.model.Status;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class EventRequestService {
+public class EventRequestServiceImpl implements EventRequestService {
 
     private final EventRequestRepository eventRequestRepository;
     private final UserRepository userRepository;
@@ -32,6 +33,7 @@ public class EventRequestService {
     private final ModelMapper modelMapper;
 
 
+    @Override
     public EventRequestDto createEventRequest(long userId, long eventId) {
         eventRequestRepository.findByRequesterIdAndEventId(userId, eventId).ifPresent((x) -> {
             throw new ConflictException("Request already exist");
@@ -51,6 +53,7 @@ public class EventRequestService {
         return modelMapper.map(eventRequest, EventRequestDto.class);
     }
 
+    @Override
     public List<EventRequestDto> getEventRequests(long requesterId) {
         userRepository.findById(requesterId).orElseThrow(() -> new NotFoundException("User dont found"));
         List<EventRequest> eventRequests = eventRequestRepository.findByRequesterId(requesterId);
@@ -59,6 +62,7 @@ public class EventRequestService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public EventRequestDto cancelEventRequests(long requesterId, long eventRequestId) {
         userRepository.findById(requesterId).orElseThrow(() -> new NotFoundException("User dont found"));
         EventRequest eventRequest = eventRequestRepository
