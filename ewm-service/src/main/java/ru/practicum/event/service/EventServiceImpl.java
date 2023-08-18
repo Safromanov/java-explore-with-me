@@ -61,7 +61,6 @@ public class EventServiceImpl implements EventService {
             eventsByParamPage = eventRepository.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, pageRequest);
         }
         List<Event> eventsByParam = eventsByParamPage.get().collect(Collectors.toList());
-        var statViews = findViews(eventsByParam);
         var views = findViews(eventsByParam);
         var listDtoResponse = eventsByParam.stream().map(event -> {
             var responseDto = modelMapper.map(event, FullEventResponseDto.class);
@@ -231,7 +230,7 @@ public class EventServiceImpl implements EventService {
         statisticsClient.addHit("ewm-main-service", request.getRequestURI(), request);
     }
 
-    public Map<Long, Long> findViews(List<Event> events) {
+    private Map<Long, Long> findViews(List<Event> events) {
 
         ClientStatDto clientStatDto = ClientStatDto.builder().unique(true).uris(events.stream().map(Event::getUri).collect(Collectors.toList())).build();
         log.info("clientStatDto -" + clientStatDto);
