@@ -12,6 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.StatisticsClient;
 import ru.practicum.category.CategoryRepository;
 import ru.practicum.category.model.Category;
+import ru.practicum.comments.Comment;
+import ru.practicum.comments.CommentMapper;
+import ru.practicum.comments.CommentRepository;
+import ru.practicum.comments.dto.CommentDtoResponse;
+import ru.practicum.comments.dto.CreateCommentDto;
 import ru.practicum.dto.ClientStatDto;
 import ru.practicum.dto.GetStatDto;
 import ru.practicum.event.EventRepository;
@@ -46,6 +51,7 @@ public class EventServiceImpl implements EventService {
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final CommentRepository commentRepository;
     private final EventRequestRepository eventRequestRepository;
     private final StatisticsClient statisticsClient;
 
@@ -143,6 +149,7 @@ public class EventServiceImpl implements EventService {
 
         Event event = EventMapper.createDtoToEvent(eventDto, initiator, category);
         event = eventRepository.save(event);
+        log.info("State - " + event.getState());
         return EventMapper.toFullEventResponseDto(event, 0, 0);
     }
 
@@ -226,13 +233,50 @@ public class EventServiceImpl implements EventService {
                 eventRequestRepository.findRejectedDtoByIdIn(eventId, dto.getRequestIds()));
     }
 
+    @Override
+    public CommentDtoResponse createComment(Long userId, Long eventId, Long commenterId, CreateCommentDto createCommentDto) {
+        User commenter = userRepository.findById(commenterId).orElseThrow(() ->
+                new NotFoundException("User (Commenter) dont found"));
+        Event event = eventRepository.findByInitiatorIdAndId(userId, eventId)
+                .orElseThrow(() -> new NotFoundException("Event id " + eventId + " dont found"));
+
+        Comment comment = CommentMapper.toComment(commenter, event, createCommentDto);
+        comment = commentRepository.save(comment);
+        return CommentMapper.toCommentDtoResponse(comment);
+    }
+
+    @Override
+    public CommentDtoResponse updateComment(Long userId, Long eventId, Long commentId, Long commenterId, CreateCommentDto commentDto) {
+        Comment comment = commentRepository.findByIdAndCommenterIdAndEventId(commentId, commenterId, eventId)
+                .orElseThrow(() -> new NotFoundException("Comment " + commentId + " dont find"));
+        comment.setText(commentDto.getText());
+        commentRepository.save(comment);
+        return CommentMapper.toCommentDtoResponse(comment);
+    }
+
+    @Override
+    public List<CommentDtoResponse> getCommentsByParam(Long eventId, int from, int size) {
+        eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event dont found"));
+        PageRequest pageRequest = getPageRequest(from, size);
+        Page<Comment> page = commentRepository.findAllByEventId(eventId, pageRequest);
+        return page.get().map(CommentMapper::toCommentDtoResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteCommentByAdmin(long eventId, Long commentId) {
+        commentRepository.findByEventIdAndId(eventId, commentId).ifPresentOrElse(commentRepository::delete, () -> {
+            throw new NotFoundException("Comment dont found");
+        });
+    }
+
     private void addHit(HttpServletRequest request) {
         statisticsClient.addHit("ewm-main-service", request.getRequestURI(), request);
     }
 
     private Map<Long, Long> findViews(List<Event> events) {
 
-        ClientStatDto clientStatDto = ClientStatDto.builder().unique(true).uris(events.stream().map(Event::getUri).collect(Collectors.toList())).build();
+        ClientStatDto clientStatDto = ClientStatDto.builder().unique(true)
+                .uris(events.stream().map(Event::getUri).collect(Collectors.toList())).build();
         log.info("clientStatDto -" + clientStatDto);
         List<GetStatDto> dtoStatList;
         try {

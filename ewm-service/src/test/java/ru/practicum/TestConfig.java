@@ -61,9 +61,9 @@ public class TestConfig {
 
 
         Event event1 = new Event(1L, initiator1, annotation, category1, description + "FIND_ME", now.minusDays(2), now.plusMonths(1), now.minusDays(1),
-                loca, true, 1, true, title, State.PUBLISHED);
+                loca, true, 1, true, title, State.PUBLISHED, null);
         Event event2 = new Event(2L, initiator1, annotation, category2, description, now.minusDays(2), now.plusMonths(1), null,
-                loca, true, 1, true, title, State.PENDING);
+                loca, true, 1, true, title, State.PENDING, null);
 
         event1 = entityManager.merge(event1);
         event2 = entityManager.merge(event2);

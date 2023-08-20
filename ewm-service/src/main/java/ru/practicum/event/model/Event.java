@@ -6,10 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.category.model.Category;
+import ru.practicum.comments.Comment;
 import ru.practicum.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -41,6 +43,8 @@ public class Event {
     private Boolean requestModeration;
     private String title;
     private State state;
+    @OneToMany(mappedBy = "event")
+    private Set<Comment> comments;
 
     public String getUri() {
         return "/events/" + id;

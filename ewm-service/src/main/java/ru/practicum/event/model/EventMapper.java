@@ -3,6 +3,7 @@ package ru.practicum.event.model;
 import org.modelmapper.ModelMapper;
 import ru.practicum.category.dto.ResponseCategoryDto;
 import ru.practicum.category.model.Category;
+import ru.practicum.comments.dto.CommentDtoResponse;
 import ru.practicum.event.dto.EventCreateDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.FullEventResponseDto;
@@ -10,6 +11,8 @@ import ru.practicum.user.model.User;
 import ru.practicum.user.model.dto.UserShortDto;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 
 public class EventMapper {
@@ -17,11 +20,16 @@ public class EventMapper {
 
     public static Event createDtoToEvent(EventCreateDto eventDto, User initiator, Category category) {
         Event event = new Event();
-
+//        if (eventDto.getRequestModeration())
+            event.setState(State.PENDING);
+//        else {
+//            event.setState(State.PUBLISHED);
+//            event.setPublishedOn(LocalDateTime.now());
+//        };
         event.setInitiator(initiator);
         event.setCategory(category);
         event.setCreatedOn(LocalDateTime.now());
-        event.setState(State.PENDING);
+
 
         event.setAnnotation(eventDto.getAnnotation());
         event.setEventDate(eventDto.getEventDate());
@@ -57,6 +65,13 @@ public class EventMapper {
         fullEventResponseDto.setTitle(event.getTitle());
         fullEventResponseDto.setParticipantLimit(event.getParticipantLimit());
         fullEventResponseDto.setRequestModeration(event.getRequestModeration());
+        if (event.getComments() != null) {
+            fullEventResponseDto.setComments(event.getComments().stream().map(e -> {
+                CommentDtoResponse dto = modelMapper.map(e, CommentDtoResponse.class);
+                dto.setAuthorName(e.getCommenter().getName());
+                return dto;
+            }).collect(Collectors.toSet()));
+        } else event.setComments(new HashSet<>());
         return fullEventResponseDto;
     }
 
