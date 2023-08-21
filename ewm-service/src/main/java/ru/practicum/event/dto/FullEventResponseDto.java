@@ -41,5 +41,5 @@ public class FullEventResponseDto {
     private int confirmedRequests;
     private State state;
     private long views;
-    private Set<CommentDtoResponse> comments;
+//    private Set<CommentDtoResponse> comments;
 }

@@ -20,12 +20,7 @@ public class EventMapper {
 
     public static Event createDtoToEvent(EventCreateDto eventDto, User initiator, Category category) {
         Event event = new Event();
-//        if (eventDto.getRequestModeration())
-            event.setState(State.PENDING);
-//        else {
-//            event.setState(State.PUBLISHED);
-//            event.setPublishedOn(LocalDateTime.now());
-//        };
+        event.setState(State.PENDING);
         event.setInitiator(initiator);
         event.setCategory(category);
         event.setCreatedOn(LocalDateTime.now());
@@ -65,13 +60,13 @@ public class EventMapper {
         fullEventResponseDto.setTitle(event.getTitle());
         fullEventResponseDto.setParticipantLimit(event.getParticipantLimit());
         fullEventResponseDto.setRequestModeration(event.getRequestModeration());
-        if (event.getComments() != null) {
-            fullEventResponseDto.setComments(event.getComments().stream().map(e -> {
-                CommentDtoResponse dto = modelMapper.map(e, CommentDtoResponse.class);
-                dto.setAuthorName(e.getCommenter().getName());
-                return dto;
-            }).collect(Collectors.toSet()));
-        } else event.setComments(new HashSet<>());
+//        if (event.getComments() != null) {
+//            fullEventResponseDto.setComments(event.getComments().stream().map(e -> {
+//                CommentDtoResponse dto = modelMapper.map(e, CommentDtoResponse.class);
+//                dto.setAuthorName(e.getAuthor().getName());
+//                return dto;
+//            }).collect(Collectors.toSet()));
+//        } else event.setComments(new HashSet<>());
         return fullEventResponseDto;
     }
 

@@ -247,7 +247,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public CommentDtoResponse updateComment(Long userId, Long eventId, Long commentId, Long commenterId, CreateCommentDto commentDto) {
-        Comment comment = commentRepository.findByIdAndCommenterIdAndEventId(commentId, commenterId, eventId)
+        Comment comment = commentRepository.findByIdAndAuthorIdAndEventId(commentId, commenterId, eventId)
                 .orElseThrow(() -> new NotFoundException("Comment " + commentId + " dont find"));
         comment.setText(commentDto.getText());
         commentRepository.save(comment);

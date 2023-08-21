@@ -14,17 +14,19 @@ public class CommentMapper {
         comment.setCreated(LocalDateTime.now());
         comment.setText(commentDto.getText());
         comment.setEvent(event);
-        comment.setCommenter(commenter);
+        comment.setAuthor(commenter);
+        comment.setEdited(false);
         return comment;
     }
 
     public static CommentDtoResponse toCommentDtoResponse(Comment comment) {
         CommentDtoResponse dtoResponse = new CommentDtoResponse();
         dtoResponse.setId(comment.getId());
-        dtoResponse.setAuthorName(comment.getCommenter().getName());
+        dtoResponse.setAuthorName(comment.getAuthor().getName());
         dtoResponse.setCreated(comment.getCreated());
         dtoResponse.setText(comment.getText());
         dtoResponse.setEventId(comment.getEvent().getId());
+        dtoResponse.setEdited(comment.isEdited());
         return dtoResponse;
     }
 }

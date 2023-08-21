@@ -25,9 +25,11 @@ public class Comment {
 
     private String text;
     @OneToOne
-    private User commenter;
+    private User author;
     @ManyToOne
     private Event event;
+
+    private boolean edited;
 
     private LocalDateTime created;
 }

@@ -20,4 +20,5 @@ public class CommentDtoResponse {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;
     private Long eventId;
+    private boolean edited;
 }
