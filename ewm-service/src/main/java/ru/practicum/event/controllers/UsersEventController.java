@@ -5,8 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.comments.dto.CommentDtoResponse;
-import ru.practicum.comments.dto.CreateCommentDto;
 import ru.practicum.event.dto.EventCreateDto;
 import ru.practicum.event.dto.EventPatchUserDto;
 import ru.practicum.event.dto.EventShortDto;
@@ -87,28 +85,5 @@ public class UsersEventController {
                                                      @RequestBody @Valid EventRequestsPatchDto dto, HttpServletRequest request) {
         log.info("Patch Request {} with dto: {}.", request.getRequestURI(), dto);
         return eventService.changeStatusRequests(userId, eventId, dto);
-    }
-
-    @PostMapping("/{eventId}/comments")
-    @ResponseStatus(HttpStatus.CREATED)
-    public CommentDtoResponse createComment(@PathVariable @Positive Long userId,
-                                            @PathVariable @Positive Long eventId,
-                                            @RequestParam @Positive Long commenterId,
-                                            @RequestBody @Valid CreateCommentDto comment) {
-        log.info("User {} Created comment '{}' for event {}", commenterId, comment.getText(), eventId);
-        CommentDtoResponse response = eventService.createComment(userId, eventId, commenterId, comment);
-        log.info("Comment created, id = " + response.getId());
-        return response;
-    }
-
-    @PatchMapping("/{eventId}/comments")
-    @ResponseStatus(HttpStatus.OK)
-    public CommentDtoResponse updateComment(@PathVariable @Positive Long userId,
-                                            @PathVariable @Positive Long eventId,
-                                            @RequestParam @Positive Long commenterId,
-                                            @RequestParam @Positive Long commentId,
-                                            @RequestBody @Valid CreateCommentDto comment) {
-        log.info("User {} updating comment {} with text {} for event {}", userId, commentId, comment.getText(), eventId);
-        return eventService.updateComment(userId, eventId, commentId, commenterId, comment);
     }
 }

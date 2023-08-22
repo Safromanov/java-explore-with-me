@@ -3,7 +3,6 @@ package ru.practicum.event.model;
 import org.modelmapper.ModelMapper;
 import ru.practicum.category.dto.ResponseCategoryDto;
 import ru.practicum.category.model.Category;
-import ru.practicum.comments.dto.CommentDtoResponse;
 import ru.practicum.event.dto.EventCreateDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.FullEventResponseDto;
@@ -11,8 +10,6 @@ import ru.practicum.user.model.User;
 import ru.practicum.user.model.dto.UserShortDto;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.stream.Collectors;
 
 
 public class EventMapper {

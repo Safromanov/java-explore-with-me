@@ -6,11 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.category.dto.ResponseCategoryDto;
-import ru.practicum.comments.dto.CommentDtoResponse;
 import ru.practicum.user.model.dto.UserShortDto;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,5 +26,4 @@ public class EventShortDto {
     private String title;
     private int confirmedRequests;
     private long views;
-//    private Set<CommentDtoResponse> comments;
 }

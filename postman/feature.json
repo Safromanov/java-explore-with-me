@@ -1,16 +1,16 @@
 {
 	"info": {
-		"_postman_id": "21bc2c14-affe-4d72-97bd-51fd1a6c3a1d",
+		"_postman_id": "6f24940d-e48e-4efa-b663-341a644fe1ec",
 		"name": "feature",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "28834303"
+		"_exporter_id": "17900661"
 	},
 	"item": [
 		{
 			"name": "Comment",
 			"item": [
 				{
-					"name": "Добавление коммента",
+					"name": "Добавление коммента rev. ver 1",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -27,9 +27,10 @@
 									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
 									"        pm.collectionVariables.set(\"uid\", user.id);\r",
 									"        pm.collectionVariables.set(\"eid\", event.id);        \r",
-									"        pm.collectionVariables.set(\"response\", event);\r",
-									"        pm.request.removeQueryParams(['commenterId']);\r",
-									"        pm.request.addQueryParams([`commenterId=` + commenter.id]);\r",
+									"        pm.request.removeQueryParams(['authorId']);\r",
+									"        pm.request.addQueryParams([`authorId=` + commenter.id]);\r",
+									"\r",
+									"       const comment = await api.addComment(commenter.id, rnd.getComment(event.id));\r",
 									"    } catch(err) {\r",
 									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
 									"    }\r",
@@ -95,23 +96,138 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"text\":\"Important comment\"}"
+							"raw": "{\r\n    \"text\":\"Important comment\", \r\n    \"event\":{{eid}}\r\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/users/:userId/events/:eventId/comments?commenterId=0",
+							"raw": "{{baseUrl}}/comments?authorId=0",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"users",
-								":userId",
-								"events",
-								":eventId",
 								"comments"
 							],
 							"query": [
 								{
-									"key": "commenterId",
+									"key": "eventId",
+									"value": "0",
+									"description": "(Required) id события",
+									"disabled": true
+								},
+								{
+									"key": "authorId",
+									"value": "0"
+								}
+							]
+						},
+						"description": "Обратите внимание:\n- нельзя добавить повторный запрос\n- инициатор события не может добавить запрос на участие в своём событии\n- нельзя участвовать в неопубликованном событии\n- если у события достигнут лимит запросов на участие - необходимо вернуть ошибку\n- если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного"
+					},
+					"response": []
+				},
+				{
+					"name": "Изменение коммента rev. ver 1 Copy",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const main = async () => {\r",
+									"    const api = new API(pm);\r",
+									"    const rnd = new RandomUtils();\r",
+									"\r",
+									"    try {\r",
+									"        const user = await api.addUser(rnd.getUser());\r",
+									"        const commenter = await api.addUser(rnd.getUser());\r",
+									"        const category = await api.addCategory(rnd.getCategory());\r",
+									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        pm.collectionVariables.set(\"uid\", user.id);\r",
+									"        pm.collectionVariables.set(\"eid\", event.id);    \r",
+									"        \r",
+									"        pm.request.removeQueryParams(['authorId']);\r",
+									"        pm.request.addQueryParams([`authorId=` + commenter.id]);\r",
+									"\r",
+									"\r",
+									"        const comment = await api.addComment(commenter.id, rnd.getComment(event.id));\r",
+									"        pm.collectionVariables.set(\"commentId\", comment.id);      \r",
+									"        pm.request.removeQueryParams(['commentId']);\r",
+									"        pm.request.addQueryParams([`commentId=` + comment.id]);\r",
+									"    } catch(err) {\r",
+									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"const interval = setInterval(() => {}, 1000);\r",
+									"\r",
+									"setTimeout(async () => \r",
+									"    {\r",
+									"        try {\r",
+									"            await main();\r",
+									"        } catch (e) {\r",
+									"            console.error(e);\r",
+									"        } finally {\r",
+									"            clearInterval(interval);\r",
+									"        }\r",
+									"    },  \r",
+									"    100 \r",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+									"    pm.response.to.have.status(200);   \r",
+									"    pm.response.to.be.withBody;\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"const target = pm.response.json();\r",
+									"var query = {};\r",
+									"pm.request.url.query.all().forEach((param) => { query[param.key] = param.value});\r",
+									"\r",
+									"pm.test(\"Запрос на участие должен содержать поля: id, requester, event, status, created\", function () {\r",
+									"pm.expect(target).to.have.property('id');\r",
+									"pm.expect(target).to.have.property('text');\r",
+									"pm.expect(target).to.have.property('authorName');\r",
+									"pm.expect(target).to.have.property('eventId');\r",
+									"pm.expect(target).to.have.property('created');\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\":\"Very Important comment\", \r\n    \"id\":{{commentId}}\r\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/comments?authorId=0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"comments"
+							],
+							"query": [
+								{
+									"key": "authorId",
 									"value": "0"
 								},
 								{
@@ -120,17 +236,434 @@
 									"description": "(Required) id события",
 									"disabled": true
 								}
+							]
+						},
+						"description": "Обратите внимание:\n- нельзя добавить повторный запрос\n- инициатор события не может добавить запрос на участие в своём событии\n- нельзя участвовать в неопубликованном событии\n- если у события достигнут лимит запросов на участие - необходимо вернуть ошибку\n- если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного"
+					},
+					"response": []
+				},
+				{
+					"name": "Изменение коммента Админа",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const main = async () => {\r",
+									"    const api = new API(pm);\r",
+									"    const rnd = new RandomUtils();\r",
+									"\r",
+									"    try {\r",
+									"        const user = await api.addUser(rnd.getUser());\r",
+									"        const commenter = await api.addUser(rnd.getUser());\r",
+									"        const category = await api.addCategory(rnd.getCategory());\r",
+									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        pm.collectionVariables.set(\"uid\", user.id);\r",
+									"        pm.collectionVariables.set(\"eid\", event.id);    \r",
+									"        \r",
+									"        pm.request.removeQueryParams(['authorId']);\r",
+									"        pm.request.addQueryParams([`authorId=` + commenter.id]);\r",
+									"\r",
+									"\r",
+									"        const comment = await api.addComment(commenter.id, rnd.getComment(event.id));\r",
+									"        pm.collectionVariables.set(\"commentId\", comment.id);      \r",
+									"        pm.request.removeQueryParams(['commentId']);\r",
+									"        pm.request.addQueryParams([`commentId=` + comment.id]);\r",
+									"    } catch(err) {\r",
+									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"const interval = setInterval(() => {}, 1000);\r",
+									"\r",
+									"setTimeout(async () => \r",
+									"    {\r",
+									"        try {\r",
+									"            await main();\r",
+									"        } catch (e) {\r",
+									"            console.error(e);\r",
+									"        } finally {\r",
+									"            clearInterval(interval);\r",
+									"        }\r",
+									"    },  \r",
+									"    100 \r",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+									"    pm.response.to.have.status(200);   \r",
+									"    pm.response.to.be.withBody;\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"const target = pm.response.json();\r",
+									"var query = {};\r",
+									"pm.request.url.query.all().forEach((param) => { query[param.key] = param.value});\r",
+									"\r",
+									"pm.test(\"Запрос на участие должен содержать поля: id, requester, event, status, created\", function () {\r",
+									"pm.expect(target).to.have.property('id');\r",
+									"pm.expect(target).to.have.property('text');\r",
+									"pm.expect(target).to.have.property('authorName');\r",
+									"pm.expect(target).to.have.property('eventId');\r",
+									"pm.expect(target).to.have.property('created');\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\":\"BANNED\", \r\n    \"id\":{{commentId}}\r\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/comments",
+							"host": [
+								"{{baseUrl}}"
 							],
-							"variable": [
+							"path": [
+								"admin",
+								"comments"
+							],
+							"query": [
 								{
-									"key": "userId",
-									"value": "{{uid}}",
-									"type": "string",
-									"description": "(Required) id текущего пользователя"
+									"key": "eventId",
+									"value": "0",
+									"description": "(Required) id события",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Обратите внимание:\n- нельзя добавить повторный запрос\n- инициатор события не может добавить запрос на участие в своём событии\n- нельзя участвовать в неопубликованном событии\n- если у события достигнут лимит запросов на участие - необходимо вернуть ошибку\n- если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного"
+					},
+					"response": []
+				},
+				{
+					"name": "Удаление коммента автором",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const main = async () => {\r",
+									"    const api = new API(pm);\r",
+									"    const rnd = new RandomUtils();\r",
+									"\r",
+									"    try {\r",
+									"        const user = await api.addUser(rnd.getUser());\r",
+									"        const commenter = await api.addUser(rnd.getUser());\r",
+									"        const category = await api.addCategory(rnd.getCategory());\r",
+									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        pm.collectionVariables.set(\"uid\", user.id);\r",
+									"        pm.collectionVariables.set(\"eid\", event.id);             \r",
+									"        pm.request.removeQueryParams(['authorId']);\r",
+									"        pm.request.addQueryParams([`authorId=` + commenter.id]);\r",
+									"\r",
+									"\r",
+									"       const comment = await api.addComment(commenter.id, rnd.getComment(event.id));\r",
+									"       pm.collectionVariables.set(\"commentId\", comment.id);     \r",
+									"        pm.request.removeQueryParams(['commentId']);\r",
+									"        pm.request.addQueryParams([`commentId=` + comment.id]);\r",
+									"    } catch(err) {\r",
+									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"const interval = setInterval(() => {}, 1000);\r",
+									"\r",
+									"setTimeout(async () => \r",
+									"    {\r",
+									"        try {\r",
+									"            await main();\r",
+									"        } catch (e) {\r",
+									"            console.error(e);\r",
+									"        } finally {\r",
+									"            clearInterval(interval);\r",
+									"        }\r",
+									"    },  \r",
+									"    100 \r",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Ответ должен содержать код статуса 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\":\"Very Important comment\", \r\n    \"id\":{{commentId}}\r\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/comments/{{commentId}}?authorId=0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"comments",
+								"{{commentId}}"
+							],
+							"query": [
+								{
+									"key": "authorId",
+									"value": "0"
 								},
 								{
 									"key": "eventId",
-									"value": "{{eid}}"
+									"value": "0",
+									"description": "(Required) id события",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Обратите внимание:\n- нельзя добавить повторный запрос\n- инициатор события не может добавить запрос на участие в своём событии\n- нельзя участвовать в неопубликованном событии\n- если у события достигнут лимит запросов на участие - необходимо вернуть ошибку\n- если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного"
+					},
+					"response": []
+				},
+				{
+					"name": "Удаление коммента Админом",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const main = async () => {\r",
+									"    const api = new API(pm);\r",
+									"    const rnd = new RandomUtils();\r",
+									"\r",
+									"    try {\r",
+									"        const user = await api.addUser(rnd.getUser());\r",
+									"        const commenter = await api.addUser(rnd.getUser());\r",
+									"        const category = await api.addCategory(rnd.getCategory());\r",
+									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        pm.collectionVariables.set(\"uid\", user.id);\r",
+									"        pm.collectionVariables.set(\"eid\", event.id);    \r",
+									"        pm.collectionVariables.set(\"commentId\", event.id);      \r",
+									"        pm.request.removeQueryParams(['authorId']);\r",
+									"        pm.request.addQueryParams([`authorId=` + commenter.id]);\r",
+									"\r",
+									"\r",
+									"       const comment = await api.addComment(commenter.id, rnd.getComment(event.id));\r",
+									"        pm.collectionVariables.set(\"commentId\", comment.id);     \r",
+									"        pm.request.removeQueryParams(['commentId']);\r",
+									"        pm.request.addQueryParams([`commentId=` + comment.id]);\r",
+									"    } catch(err) {\r",
+									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"const interval = setInterval(() => {}, 1000);\r",
+									"\r",
+									"setTimeout(async () => \r",
+									"    {\r",
+									"        try {\r",
+									"            await main();\r",
+									"        } catch (e) {\r",
+									"            console.error(e);\r",
+									"        } finally {\r",
+									"            clearInterval(interval);\r",
+									"        }\r",
+									"    },  \r",
+									"    100 \r",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Ответ должен содержать код статуса 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\":\"Very Important comment\", \r\n    \"id\":{{commentId}}\r\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/comments/{{commentId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"comments",
+								"{{commentId}}"
+							],
+							"query": [
+								{
+									"key": "eventId",
+									"value": "0",
+									"description": "(Required) id события",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Обратите внимание:\n- нельзя добавить повторный запрос\n- инициатор события не может добавить запрос на участие в своём событии\n- нельзя участвовать в неопубликованном событии\n- если у события достигнут лимит запросов на участие - необходимо вернуть ошибку\n- если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного"
+					},
+					"response": []
+				},
+				{
+					"name": "Найти коммент по id",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const main = async () => {\r",
+									"    const api = new API(pm);\r",
+									"    const rnd = new RandomUtils();\r",
+									"\r",
+									"    try {\r",
+									"        const user = await api.addUser(rnd.getUser());\r",
+									"        const commenter = await api.addUser(rnd.getUser());\r",
+									"        const category = await api.addCategory(rnd.getCategory());\r",
+									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        pm.collectionVariables.set(\"uid\", user.id);\r",
+									"        pm.collectionVariables.set(\"eid\", event.id);    \r",
+									"\r",
+									"        pm.request.removeQueryParams(['authorId']);\r",
+									"        pm.request.addQueryParams([`authorId=` + commenter.id]);\r",
+									"\r",
+									"\r",
+									"       const comment = await api.addComment(commenter.id, rnd.getComment(event.id));\r",
+									"        pm.collectionVariables.set(\"commentId\", comment.id);      \r",
+									"        pm.request.removeQueryParams(['commentId']);\r",
+									"        pm.request.addQueryParams([`commentId=` + comment.id]);\r",
+									"    } catch(err) {\r",
+									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"const interval = setInterval(() => {}, 1000);\r",
+									"\r",
+									"setTimeout(async () => \r",
+									"    {\r",
+									"        try {\r",
+									"            await main();\r",
+									"        } catch (e) {\r",
+									"            console.error(e);\r",
+									"        } finally {\r",
+									"            clearInterval(interval);\r",
+									"        }\r",
+									"    },  \r",
+									"    100 \r",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Ответ должен содержать код статуса 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\":\"Very Important comment\", \r\n    \"id\":{{commentId}}\r\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/comments/{{commentId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"comments",
+								"{{commentId}}"
+							],
+							"query": [
+								{
+									"key": "eventId",
+									"value": "0",
+									"description": "(Required) id события",
+									"disabled": true
 								}
 							]
 						},
@@ -251,7 +784,7 @@
 					"response": []
 				},
 				{
-					"name": "Изменение коммента",
+					"name": "Получение всех комментов автора",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -264,20 +797,19 @@
 									"    try {\r",
 									"        const user = await api.addUser(rnd.getUser());\r",
 									"        const commenter = await api.addUser(rnd.getUser());\r",
+									"        const commenter2 = await api.addUser(rnd.getUser());\r",
 									"        const category = await api.addCategory(rnd.getCategory());\r",
 									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
-									"        const comment = await api.addComment(user.id, event.id, commenter.id, rnd.getComment());\r",
-									"\r",
-									"        \r",
 									"        pm.collectionVariables.set(\"uid\", user.id);\r",
-									"        pm.collectionVariables.set(\"eid\", event.id);\r",
-									"        pm.collectionVariables.set(\"response\", event);\r",
+									"        pm.collectionVariables.set(\"eid\", event.id);        \r",
+									"        pm.request.removeQueryParams(['authorId']);\r",
+									"        pm.request.addQueryParams([`authorId=` + commenter.id]);\r",
 									"\r",
-									"        \r",
-									"        pm.request.removeQueryParams(['commentId']);\r",
-									"        pm.request.addQueryParams([`commentId=` + comment.id]);\r",
-									"        pm.request.removeQueryParams(['commenterId']);\r",
-									"        pm.request.addQueryParams([`commenterId=` + commenter.id]);\r",
+									"        await api.addComment(commenter.id, rnd.getComment(event.id));\r",
+									"        await api.addComment(commenter.id, rnd.getComment(event.id));\r",
+									"        await api.addComment(commenter.id, rnd.getComment(event.id));\r",
+									"        await api.addComment(commenter2.id, rnd.getComment(event.id));\r",
+									"        await api.addComment(commenter2.id, rnd.getComment(event.id));\r",
 									"    } catch(err) {\r",
 									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
 									"    }\r",
@@ -321,134 +853,11 @@
 							}
 						}
 					],
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"text\":\"Very Important comment\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/users/:userId/events/:eventId/comments?commentId=0&commenterId=0",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"users",
-								":userId",
-								"events",
-								":eventId",
-								"comments"
-							],
-							"query": [
-								{
-									"key": "commentId",
-									"value": "0"
-								},
-								{
-									"key": "commenterId",
-									"value": "0"
-								}
-							],
-							"variable": [
-								{
-									"key": "userId",
-									"value": "{{uid}}"
-								},
-								{
-									"key": "eventId",
-									"value": "{{eid}}",
-									"description": "(Required) id отменяемого события"
-								}
-							]
-						},
-						"description": "Обратите внимание: Отменить можно только событие в состоянии ожидания модерации."
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
 					},
-					"response": []
-				},
-				{
-					"name": "Удаление коммента админом",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"const main = async () => {\r",
-									"    const api = new API(pm);\r",
-									"    const rnd = new RandomUtils();\r",
-									"\r",
-									"    try {\r",
-									"        const user = await api.addUser(rnd.getUser());\r",
-									"        const commenter = await api.addUser(rnd.getUser());\r",
-									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
-									"        const comment = await api.addComment(user.id, event.id, commenter.id, rnd.getComment());\r",
-									"\r",
-									"        \r",
-									"        pm.collectionVariables.set(\"uid\", user.id);\r",
-									"        pm.collectionVariables.set(\"eid\", event.id);\r",
-									"        pm.collectionVariables.set(\"response\", event);\r",
-									"\r",
-									"        \r",
-									"        pm.request.removeQueryParams(['commentId']);\r",
-									"        pm.request.addQueryParams([`commentId=` + comment.id]);\r",
-									"        pm.request.removeQueryParams(['commenterId']);\r",
-									"        pm.request.addQueryParams([`commenterId=` + commenter.id]);\r",
-									"    } catch(err) {\r",
-									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-									"    }\r",
-									"};\r",
-									"\r",
-									"const interval = setInterval(() => {}, 1000);\r",
-									"\r",
-									"setTimeout(async () => \r",
-									"    {\r",
-									"        try {\r",
-									"            await main();\r",
-									"        } catch (e) {\r",
-									"            console.error(e);\r",
-									"        } finally {\r",
-									"            clearInterval(interval);\r",
-									"        }\r",
-									"    },  \r",
-									"    100 \r",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Ответ должен содержать код статуса 204\", function () {\r",
-									"    pm.response.to.have.status(204);\r",
-									"});\r",
-									"\r",
-									"\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
 					"request": {
-						"method": "DELETE",
+						"method": "GET",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -469,27 +878,17 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/admin/events/:eventId/comments?commentId=0",
+							"raw": "{{baseUrl}}/comments?authorId=0",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"admin",
-								"events",
-								":eventId",
 								"comments"
 							],
 							"query": [
 								{
-									"key": "commentId",
+									"key": "authorId",
 									"value": "0"
-								}
-							],
-							"variable": [
-								{
-									"key": "eventId",
-									"value": "{{eid}}",
-									"description": "(Required) id отменяемого события"
 								}
 							]
 						},
@@ -521,8 +920,8 @@
 					"        return this.post(\"/admin/categories\", category, \"Ошибка при добавлении новой категории: \", verbose);",
 					"    }",
 					"",
-					"    async addComment(userId, eventId, commenterId, comment, verbose=null) {",
-					"        return this.post(\"/users/\" + userId + \"/events/\" + eventId + \"/comments?commenterId=\" + commenterId, comment, \"Ошибка при добавлении нового комментария: \", verbose);",
+					"    async addComment(authorId, comment, verbose=null) {",
+					"        return this.post(\"/comments?authorId=\" + authorId, comment, \"Ошибка при добавлении нового комментария: \", verbose);",
 					"    }",
 					"",
 					"    async addEvent(userId, event, verbose=null) {",
@@ -629,9 +1028,10 @@
 					"        };",
 					"    }",
 					"    ",
-					"    getComment() {",
+					"    getComment(eventId) {",
 					"        return {",
-					"            text: pm.variables.replaceIn('{{$randomWord}}')         ",
+					"            text: pm.variables.replaceIn('{{$randomWord}}'),",
+					"            event: eventId    ",
 					"        };",
 					"    }",
 					"",
@@ -798,6 +1198,11 @@
 		{
 			"key": "source",
 			"value": ""
+		},
+		{
+			"key": "commentId",
+			"value": "1",
+			"type": "string"
 		}
 	]
 }

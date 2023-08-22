@@ -54,11 +54,4 @@ public class AdminsEventController {
         }
         return eventService.updateEvent(eventId, dto);
     }
-
-    @DeleteMapping("/{eventId}/comments")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteComment(@PathVariable @Positive long eventId, @RequestParam @Positive Long commentId) {
-        log.info("Delete Comment - {} by Admin", commentId);
-        eventService.deleteCommentByAdmin(eventId, commentId);
-    }
 }

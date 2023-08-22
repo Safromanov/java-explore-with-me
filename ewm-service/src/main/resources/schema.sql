@@ -73,7 +73,7 @@ CREATE TABLE comments
     text      VARCHAR(16000),
     author_id BIGINT REFERENCES users (id) ON DELETE CASCADE  NOT NULL,
     event_id  BIGINT REFERENCES events (id) ON DELETE CASCADE NOT NULL,
-    created   TIMESTAMP WITHOUT TIME ZONE,
+    created   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     edited BOOLEAN                                 NOT NULL,
     CONSTRAINT pk_comments PRIMARY KEY (id)
 );

@@ -1,7 +1,5 @@
 package ru.practicum.event.service;
 
-import ru.practicum.comments.dto.CommentDtoResponse;
-import ru.practicum.comments.dto.CreateCommentDto;
 import ru.practicum.event.dto.*;
 import ru.practicum.event.model.SortEvent;
 import ru.practicum.requests.dto.EventRequestsPatchDto;
@@ -36,12 +34,4 @@ public interface EventService {
     List<FullRequestsDto> getRequestForEvent(Long userId, Long eventId);
 
     StatusListRequestDto changeStatusRequests(Long userId, Long eventId, EventRequestsPatchDto dto);
-
-    CommentDtoResponse createComment(Long userId, Long eventId, Long commenterId,CreateCommentDto comment);
-
-    CommentDtoResponse updateComment(Long userId, Long eventId, Long commentId, Long commenterId, CreateCommentDto comment);
-
-    List<CommentDtoResponse> getCommentsByParam(Long eventId, int from, int size);
-
-    void deleteCommentByAdmin(long eventId, Long commentId);
 }
