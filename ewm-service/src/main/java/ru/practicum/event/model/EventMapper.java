@@ -57,13 +57,6 @@ public class EventMapper {
         fullEventResponseDto.setTitle(event.getTitle());
         fullEventResponseDto.setParticipantLimit(event.getParticipantLimit());
         fullEventResponseDto.setRequestModeration(event.getRequestModeration());
-//        if (event.getComments() != null) {
-//            fullEventResponseDto.setComments(event.getComments().stream().map(e -> {
-//                CommentDtoResponse dto = modelMapper.map(e, CommentDtoResponse.class);
-//                dto.setAuthorName(e.getAuthor().getName());
-//                return dto;
-//            }).collect(Collectors.toSet()));
-//        } else event.setComments(new HashSet<>());
         return fullEventResponseDto;
     }
 
