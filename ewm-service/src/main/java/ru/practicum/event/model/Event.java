@@ -43,9 +43,6 @@ public class Event {
     private Boolean requestModeration;
     private String title;
     private State state;
-    @OneToMany(mappedBy = "event")
-    private Set<Comment> comments;
-
     public String getUri() {
         return "/events/" + id;
     }

@@ -26,4 +26,5 @@ public class EventShortDto {
     private String title;
     private int confirmedRequests;
     private long views;
+    private long comments;
 }

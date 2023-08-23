@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.StatisticsClient;
 import ru.practicum.category.CategoryRepository;
 import ru.practicum.category.model.Category;
+import ru.practicum.comments.CommentRepository;
 import ru.practicum.dto.ClientStatDto;
 import ru.practicum.dto.GetStatDto;
 import ru.practicum.event.EventRepository;
@@ -42,6 +43,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class EventServiceImpl implements EventService {
 
+    private final CommentRepository commentRepository;
     private final EventRepository eventRepository;
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
@@ -119,9 +121,15 @@ public class EventServiceImpl implements EventService {
             eventsByParam = eventRepository.getEventsByParam(text, categories, paid, rangeStart, rangeEnd, pageRequest);
         }
         addHit(request);
-        return eventsByParam.get().map(event -> modelMapper.map(event, EventShortDto.class)).collect(Collectors.toList());
+        return eventsByParam.get().map((event) -> {
+            Map<Long, Long> views = findViews(List.of(event));
+            return EventMapper.toShortEventDto(event,
+                    event.getInitiator(),
+                    eventRequestRepository.countByStatusConfirmed(event.getId()),
+                    views.containsKey(event.getId()) ? views.get(event.getId()) : 0,
+                    commentRepository.countByEventId(event.getId()));
+        }).collect(Collectors.toList());
     }
-
 
     @Override
     public FullEventResponseDto getEventPublic(long eventId, HttpServletRequest request) {
@@ -151,8 +159,14 @@ public class EventServiceImpl implements EventService {
     public List<EventShortDto> getEventsForUser(long userId, int from, int size) {
         PageRequest pageRequest = getPageRequest(from, size);
         User initiator = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User dont found"));
-        return eventRepository.findAll(pageRequest).stream().map((x) ->
-                EventMapper.toGetEventDto(x, initiator, 0, 0)).collect(Collectors.toList());
+        return eventRepository.findAll(pageRequest).stream().map((event) -> {
+            Map<Long, Long> views = findViews(List.of(event));
+            return EventMapper.toShortEventDto(event,
+                    initiator,
+                    eventRequestRepository.countByStatusConfirmed(event.getId()),
+                    views.containsKey(event.getId()) ? views.get(event.getId()) : 0,
+                    commentRepository.countByEventId(event.getId()));
+        }).collect(Collectors.toList());
     }
 
     @Override
