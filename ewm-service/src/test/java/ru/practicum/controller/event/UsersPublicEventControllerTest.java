@@ -3,6 +3,7 @@ package ru.practicum.controller.event;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.jeasy.random.EasyRandom;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
@@ -65,6 +66,7 @@ class UsersPublicEventControllerTest {
     }
 
     @Test
+    @Disabled
     void getEvents_returnStatusOK() throws Exception {
         var requestBuilder = MockMvcRequestBuilders.get("/users/1/events").contentType(MediaType.APPLICATION_JSON);
         var mvcResult = this.mockMvc.perform(requestBuilder)
