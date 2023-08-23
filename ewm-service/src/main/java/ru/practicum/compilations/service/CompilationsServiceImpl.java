@@ -50,9 +50,9 @@ public class CompilationsServiceImpl implements CompilationsService {
     }
 
     @Override
-    public CompilationCreateResponse createCompilation(CompilationDtoReq compilationDDto, HttpServletRequest request) {
-        List<Event> event = eventRepository.findByIdIn(compilationDDto.getEventIds());
-        var compilation = CompilationMapper.createDTOToEntity(compilationDDto, event);
+    public CompilationCreateResponse createCompilation(CompilationDtoReq compilationDto, HttpServletRequest request) {
+        List<Event> event = eventRepository.findByIdIn(compilationDto.getEventIds());
+        Compilation compilation = CompilationMapper.createDtoToEntity(compilationDto, event);
         compilation = compilationRepository.save(compilation);
         return modelMapper.map(compilation, CompilationCreateResponse.class);
     }

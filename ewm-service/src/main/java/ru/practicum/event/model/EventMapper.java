@@ -17,11 +17,11 @@ public class EventMapper {
 
     public static Event createDtoToEvent(EventCreateDto eventDto, User initiator, Category category) {
         Event event = new Event();
-
+        event.setState(State.PENDING);
         event.setInitiator(initiator);
         event.setCategory(category);
         event.setCreatedOn(LocalDateTime.now());
-        event.setState(State.PENDING);
+
 
         event.setAnnotation(eventDto.getAnnotation());
         event.setEventDate(eventDto.getEventDate());
@@ -60,13 +60,13 @@ public class EventMapper {
         return fullEventResponseDto;
     }
 
-    public static EventShortDto toGetEventDto(Event event, User initiator, int confirmedRequests, int views) {
+    public static EventShortDto toShortEventDto(Event event, User initiator, int confirmedRequests, long views, long comments) {
         EventShortDto eventDto = new EventShortDto();
         eventDto.setId(event.getId());
         eventDto.setInitiator(modelMapper.map(initiator, UserShortDto.class));
         eventDto.setAnnotation(event.getAnnotation());
         eventDto.setCategory(modelMapper.map(event.getCategory(), ResponseCategoryDto.class));
-
+        eventDto.setComments(comments);
         eventDto.setEventDate(event.getEventDate());
         eventDto.setPaid(event.getPaid());
         eventDto.setTitle(event.getTitle());

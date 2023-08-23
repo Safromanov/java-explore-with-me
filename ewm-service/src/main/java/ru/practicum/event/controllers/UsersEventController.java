@@ -32,11 +32,14 @@ public class UsersEventController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public FullEventResponseDto createEvent(@RequestBody @Valid EventCreateDto eventDto, @PathVariable Long userId, HttpServletRequest request) {
-        log.info("POST {} with dto: {}.", request.getRequestURI(), eventDto);
+    public FullEventResponseDto createEvent(@RequestBody @Valid EventCreateDto eventDto,
+                                            @PathVariable Long userId) {
+        log.info("Creating event, user id {},  dto: {}.", userId, eventDto);
         if (eventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2)))
             throw new BadRequestException("Field: eventDate. The event must start no later than 2 hours from the current time.");
-        return eventService.createEvent(eventDto, userId);
+        FullEventResponseDto event = eventService.createEvent(eventDto, userId);
+        log.info("Event created, id = " + event.getId());
+        return event;
     }
 
     @GetMapping
